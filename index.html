@@ -214,7 +214,96 @@
   .reveal-name{margin:11px 0 0;color:#FBFFFF;font-size:19px;font-weight:900;letter-spacing:.09em;}
   .reveal-hint{margin:8px 0 0;color:rgba(251,255,254,.52);font-size:11.5px;font-weight:700;letter-spacing:.1em;}
 
-  /* ---------- 輕提示 ---------- */
+  /* ---------- 兌換獎品頁 ---------- */
+  #scrRedeem .wrap{margin:0 auto;}
+  .subbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .subbar .t{flex:1;font-size:17px;font-weight:900;letter-spacing:.15em;}
+  .backbtn{
+    flex:0 0 auto;width:40px;height:40px;padding:0;border:3px solid var(--ink);border-radius:12px;
+    background:var(--white);box-shadow:0 4px 0 var(--ink);display:grid;place-items:center;cursor:pointer;
+    transition:transform .1s,box-shadow .1s;
+  }
+  .backbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);}
+  .backbtn svg{width:18px;height:18px;}
+
+  .wallet{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;
+    border:3px solid var(--ink);border-radius:18px;background:var(--white);
+    box-shadow:0 5px 0 var(--ink);margin-bottom:15px;
+  }
+  .wallet .num{font-size:12.5px;font-weight:900;letter-spacing:.04em;white-space:nowrap;}
+  .wallet .num b{font-size:30px;margin-right:4px;font-variant-numeric:tabular-nums;}
+  .wallet .sub{font-size:10.5px;font-weight:800;color:#9a8d86;line-height:1.6;text-align:right;}
+
+  .prize{
+    display:flex;align-items:center;gap:12px;padding:12px;border:3px solid var(--ink);border-radius:16px;
+    background:var(--white);box-shadow:0 4px 0 var(--ink);margin-bottom:10px;
+  }
+  .prize.off{box-shadow:0 4px 0 rgba(34,23,19,.28);}
+  .prize.off .pico,.prize.off .pname,.prize.off .pmeta{opacity:.55;}
+  .pico{
+    flex:0 0 52px;width:52px;height:52px;border:2.5px solid var(--ink);border-radius:14px;
+    background:var(--paper);display:grid;place-items:center;
+  }
+  .pico svg{width:25px;height:25px;}
+  .pbody{flex:1 1 auto;min-width:0;}
+  .pname{font-size:14.5px;font-weight:900;letter-spacing:.02em;line-height:1.3;}
+  .pmeta{margin-top:4px;font-size:11px;font-weight:800;color:#8c7f78;letter-spacing:.01em;line-height:1.5;}
+  .pbtn{
+    flex:0 0 auto;padding:9px 13px;border:2.5px solid var(--ink);border-radius:12px;background:var(--red);
+    color:#fff;font:inherit;font-size:12.5px;font-weight:900;letter-spacing:.06em;
+    box-shadow:0 3px 0 var(--ink);cursor:pointer;transition:transform .1s,box-shadow .1s;
+  }
+  .pbtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink);}
+  .pbtn.off{
+    background:#EFE7DC;color:#a79b94;border-color:rgba(34,23,19,.42);box-shadow:none;cursor:default;
+  }
+  .pbtn.off:active{transform:none;box-shadow:none;}
+
+  .ruleline{margin:15px 4px 0;font-size:11px;font-weight:800;color:#9a8d86;line-height:1.8;letter-spacing:.02em;text-align:center;}
+
+  /* ---------- 底部彈層 ---------- */
+  .sheet{
+    position:fixed;inset:0;z-index:85;display:none;align-items:flex-end;justify-content:center;
+    background:rgba(18,12,10,.58);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  }
+  .sheet.on{display:flex;}
+  .sheet-box{
+    width:100%;max-width:460px;background:var(--paper);border:3px solid var(--ink);border-bottom:0;
+    border-radius:22px 22px 0 0;padding:18px 18px calc(env(safe-area-inset-bottom) + 18px);
+    box-shadow:0 -8px 30px rgba(0,0,0,.28);animation:sheetIn .28s cubic-bezier(.2,1.1,.4,1) both;
+  }
+  @keyframes sheetIn{from{transform:translateY(30px);opacity:.55;}to{transform:none;opacity:1;}}
+  .sheet h3{margin:0 0 5px;font-size:16.5px;font-weight:900;letter-spacing:.1em;}
+  .sheet .ssub{font-size:11.5px;font-weight:800;color:#8c7f78;line-height:1.65;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:13px 0 0;}
+  .chip{
+    padding:5px 10px;border:2px solid var(--ink);border-radius:9px;background:var(--white);
+    font-size:11.5px;font-weight:900;letter-spacing:.02em;
+  }
+  .chip.dim{background:#EFE7DC;border-color:rgba(34,23,19,.42);color:#8a7d76;}
+  .warn{
+    margin:11px 0 0;padding:9px 11px;border-radius:11px;background:#FDF0E4;border:2px solid #EFD3AE;
+    color:#8A5A16;font-size:11.5px;font-weight:800;line-height:1.65;
+  }
+  .sheet .btn{margin-top:16px;}
+  .codebox{
+    margin:14px 0 0;padding:15px;border:3px dashed var(--ink);border-radius:16px;background:var(--white);text-align:center;
+  }
+  .codebox .k{font-size:10.5px;font-weight:900;letter-spacing:.22em;color:#9a8d86;}
+  .codebox .v{margin-top:7px;font-size:25px;font-weight:900;letter-spacing:.12em;font-variant-numeric:tabular-nums;}
+
+  .reclist{max-height:52vh;overflow-y:auto;margin-top:12px;}
+  .rec{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 2px;border-bottom:2px dashed rgba(34,23,19,.16);}
+  .rec:last-child{border-bottom:0;}
+  .rec .rn{font-size:13px;font-weight:900;}
+  .rec .rm{margin-top:3px;font-size:10.5px;font-weight:800;color:#9a8d86;letter-spacing:.02em;}
+  .rec .rc{
+    font-size:11px;font-weight:900;color:var(--red);letter-spacing:.06em;text-align:right;white-space:nowrap;
+  }
+  .emptyrec{padding:26px 0;text-align:center;font-size:12px;font-weight:800;color:#a79b94;letter-spacing:.06em;}
+
+
   .toast{
     position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);z-index:90;
     transform:translate(-50%,-160%);opacity:0;pointer-events:none;
@@ -293,6 +382,32 @@
     </div>
   </section>
 
+  <!-- ========== 3. 兌換獎品 ========== -->
+  <section class="screen" id="scrRedeem">
+    <div class="wrap">
+      <div class="subbar">
+        <button class="backbtn" id="btnBackRedeem" type="button" aria-label="返回">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="t">兌換獎品</div>
+        <button class="ghost" id="btnRecords" type="button">兌換記錄</button>
+      </div>
+
+      <div class="wallet">
+        <div class="num"><b id="wmTotal">0</b>張印花</div>
+        <div class="sub" id="wmSub">重複卡可兌換<br>扣卡時優先扣重複</div>
+      </div>
+
+      <div id="prizeList"></div>
+
+      <p class="ruleline">
+        兌換後印花即被扣除，兌換碼 30 天內有效<br>
+        到店出示兌換碼即可領取，每人每款限兌一次
+      </p>
+    </div>
+  </section>
+
 </div>
 
 <!-- ========== 3. 發卡放大預覽 ========== -->
@@ -311,6 +426,40 @@
       <p class="reveal-name" id="revealName">—</p>
       <p class="reveal-hint">已收入卡冊 · 可與好友交換</p>
     </div>
+  </div>
+</div>
+
+<!-- ========== 4. 兌換彈層 ========== -->
+<div class="sheet" id="sheetConfirm">
+  <div class="sheet-box">
+    <h3>確認兌換</h3>
+    <p class="ssub" id="cfSub">—</p>
+    <div class="chips" id="cfChips"></div>
+    <div class="warn" id="cfWarn" style="display:none"></div>
+    <button class="btn" id="btnConfirmRedeem" type="button">確認兌換</button>
+    <button class="btn" id="btnCancelRedeem" type="button"
+            style="background:#fff;color:#221713;margin-top:9px">再想想</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheetDone">
+  <div class="sheet-box">
+    <h3>兌換成功</h3>
+    <p class="ssub" id="dnSub">—</p>
+    <div class="codebox">
+      <div class="k">兌換碼</div>
+      <div class="v" id="dnCode">—</div>
+    </div>
+    <p class="ssub" id="dnExp" style="margin-top:11px;text-align:center"></p>
+    <button class="btn" id="btnDoneClose" type="button">完成</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheetRecords">
+  <div class="sheet-box">
+    <h3>兌換記錄</h3>
+    <div class="reclist" id="recList"></div>
+    <button class="btn" id="btnRecClose" type="button">關閉</button>
   </div>
 </div>
 
@@ -360,13 +509,17 @@
 
   /* ================= DOM ================= */
   var $ = function(id){ return document.getElementById(id); };
-  var scrAuth=$('scrAuth'), scrMain=$('scrMain');
+  var scrAuth=$('scrAuth'), scrMain=$('scrMain'), scrRedeem=$('scrRedeem');
   var inPhone=$('inPhone'), inCode=$('inCode');
   var btnSendCode=$('btnSendCode'), codeHint=$('codeHint');
   var btnSubmit=$('btnSubmit'), msgEl=$('msg');
   var album=$('album'), whoAmI=$('whoAmI'), progressEl=$('progress');
   var reveal=$('reveal'), revealCard=$('revealCard'), revealName=$('revealName'), revealTag=$('revealTag');
   var btnCloseReveal=$('btnCloseReveal'), btnLogout=$('btnLogout');
+  var prizeList=$('prizeList'), wmTotal=$('wmTotal'), wmSub=$('wmSub');
+  var sheetConfirm=$('sheetConfirm'), sheetDone=$('sheetDone'), sheetRecords=$('sheetRecords');
+  var cfSub=$('cfSub'), cfChips=$('cfChips'), cfWarn=$('cfWarn');
+  var dnSub=$('dnSub'), dnCode=$('dnCode'), dnExp=$('dnExp'), recList=$('recList');
   var toastEl=$('toast'), toastTimer=null;
 
   var currentUser = '';
@@ -449,7 +602,7 @@
 
   /* ================= 屏幕切換 ================= */
   function showScreen(el){
-    [scrAuth, scrMain].forEach(function(s){ s.classList.toggle('on', s === el); });
+    [scrAuth, scrMain, scrRedeem].forEach(function(s){ s.classList.toggle('on', s === el); });
     $('stage').scrollTop = 0;
   }
 
@@ -632,8 +785,258 @@
     });
   });
 
-  /* ================= 主界面動作（尚未實作，先給回饋） ================= */
-  $('btnRedeem').addEventListener('click', function(){ toast('兌換功能即將開放'); });
+  /* ================= 兌換獎品 ================= */
+  /* 獎品設定（改這裡就能調獎品、門檻與限兌次數）
+     cost = 需要的印花張數（會扣卡，優先扣重複卡）
+     need = 額外門檻：'' 無／'full' 集齊 A–D 四款／'hidden' 持有隱藏款
+     per  = 每人限兌次數 */
+  var PRIZES = [
+    { id:'p1', name:'丸俠貼紙包',          cost:2, need:'',     per:2, quota:'限量 50 份', note:'內含 6 張角色貼紙',      icon:'sticker' },
+    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',     per:1, quota:'限量 30 份', note:'全線門市通用，不設找續',  icon:'ticket'  },
+    { id:'p3', name:'丸俠保溫袋',          cost:6, need:'',     per:1, quota:'限量 15 份', note:'活動限定，換完即止',      icon:'gift'     },
+    { id:'p4', name:'限定收藏卡冊',        cost:0, need:'full', per:1, quota:'限量 20 份', note:'集齊 A–D 四款卡即可換領', icon:'album'   }
+  ];
+
+  var ICON = {
+    sticker:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.2" stroke-linejoin="round">' +
+            '<rect x="2.6" y="2.6" width="11" height="11" rx="2"/><rect x="10.4" y="10.4" width="11" height="11" rx="2"/></svg>',
+    ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.2" stroke-linejoin="round">' +
+           '<path d="M3 8.4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1.8a1.8 1.8 0 0 0 0 3.6v1.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1.8a1.8 1.8 0 0 0 0-3.6z"/>' +
+           '<path d="M12 7.6v8.8" stroke-width="2.4" stroke-dasharray="1.8 2.2"/></svg>',
+    gift:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.1" stroke-linejoin="round">' +
+        '<rect x="3.4" y="9.6" width="17.2" height="10.6" rx="1.8"/>' +
+        '<path d="M3.4 13.6h17.2M12 9.6v10.6"/>' +
+        '<path d="M12 9.4C10.6 6.4 8.8 5.6 7.9 6.6c-1 1 .1 2.8 4.1 2.8z"/>' +
+        '<path d="M12 9.4c1.4-3 3.2-3.8 4.1-2.8 1 1-.1 2.8-4.1 2.8z"/></svg>',
+    album:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.1" stroke-linejoin="round">' +
+          '<rect x="4.2" y="3.2" width="15.6" height="17.6" rx="2"/>' +
+          '<path d="M8.2 3.2v17.6"/>' +
+          '<path d="M11.2 8.2h5.4M11.2 12h5.4" stroke-linecap="round"/></svg>'
+  };
+
+  function cardOf(id){
+    for (var i=0;i<CARDS.length;i++) if (CARDS[i].id === id) return CARDS[i];
+    return null;
+  }
+
+  function countCards(cards){
+    var m = {};
+    (cards || []).forEach(function(id){ m[id] = (m[id] || 0) + 1; });
+    return m;
+  }
+
+  function hasFullSet(cnt){
+    var ok = true;
+    CARDS.forEach(function(c){
+      if (c.id !== 'E' && !(cnt[c.id] > 0)) ok = false;
+    });
+    return ok;
+  }
+
+  function redeemCount(u, pid){
+    return (u.redeems || []).filter(function(r){ return r.pid === pid; }).length;
+  }
+
+  function prizeStatus(u, p){
+    var cnt = countCards(u.cards);
+    var total = (u.cards || []).length;
+    if (redeemCount(u, p.id) >= p.per) return { ok:false, label:'已兌換' };
+    if (p.need === 'full' && !hasFullSet(cnt)) return { ok:false, label:'未集齊' };
+    if (p.need === 'hidden' && !(cnt.E > 0)) return { ok:false, label:'未有隱藏款' };
+    if (total < p.cost) return { ok:false, label:'印花不足' };
+    return { ok:true, label:'兌換' };
+  }
+
+  /* 扣卡規劃：先扣重複（同款第 2 張起），仍不足才動單張，由普通到稀有 */
+  function planConsume(cards, n){
+    var cnt = countCards(cards);
+    var order = CARDS.map(function(c){ return c.id; });
+    var used = {}, left = n, i, k;
+
+    order.forEach(function(id){
+      while (left > 0 && (cnt[id] || 0) > 1){ used[id] = (used[id] || 0) + 1; cnt[id]--; left--; }
+    });
+    order.forEach(function(id){
+      while (left > 0 && (cnt[id] || 0) > 0){ used[id] = (used[id] || 0) + 1; cnt[id]--; left--; }
+    });
+    if (left > 0) return null;
+
+    var base = countCards(cards), out = [];
+    order.forEach(function(id){
+      var keep = (base[id] || 0) - (used[id] || 0);
+      for (i = 0; i < keep; i++) out.push(id);
+    });
+    return { used: used, cards: out, base: base };
+  }
+
+  function genCode(){
+    var A = 'ACDEFGHJKLMNPQRTUVWXY34679', s = '';
+    for (var i = 0; i < 8; i++) s += A.charAt(Math.floor(Math.random() * A.length));
+    return 'WX-' + s.slice(0, 4) + '-' + s.slice(4);
+  }
+
+  function renderRedeem(){
+    var users = readUsers(), u = users[currentUser];
+    if (!u) return;
+    u.redeems = u.redeems || [];
+
+    var cnt = countCards(u.cards), total = (u.cards || []).length, dup = 0;
+    for (var k in cnt) if (cnt[k] > 1) dup += cnt[k] - 1;
+
+    wmTotal.textContent = total;
+    wmSub.innerHTML = dup > 0
+      ? ('其中 <b style="color:#E32412">' + dup + '</b> 張重複<br>可安心拿來兌換')
+      : '暫無重複卡<br>兌換會動到卡冊';
+
+    var html = '';
+    PRIZES.forEach(function(p){
+      var st = prizeStatus(u, p);
+      var needTxt = p.cost > 0 ? ('需 ' + p.cost + ' 張印花') : '免印花';
+      if (p.need === 'full') needTxt = '集齊 A–D 四款';
+      if (p.need === 'hidden') needTxt = '需持有隱藏款';
+
+      html += '<div class="prize' + (st.ok ? '' : ' off') + '">' +
+                '<div class="pico">' + ICON[p.icon] + '</div>' +
+                '<div class="pbody">' +
+                  '<div class="pname">' + p.name + '</div>' +
+                  '<div class="pmeta">' + needTxt + ' · ' + p.quota + '<br>' + p.note + '</div>' +
+                '</div>' +
+                '<button class="pbtn' + (st.ok ? '' : ' off') + '" data-pid="' + p.id + '"' +
+                  (st.ok ? '' : ' disabled') + '>' + st.label + '</button>' +
+              '</div>';
+    });
+    prizeList.innerHTML = html;
+  }
+
+  /* ---------- 彈層控制 ---------- */
+  function openSheet(el){ el.classList.add('on'); }
+  function closeSheet(el){ el.classList.remove('on'); }
+
+  var pendingPrize = null;
+
+  function openConfirm(p){
+    var users = readUsers(), u = users[currentUser];
+    if (!u) return;
+    pendingPrize = p;
+
+    cfSub.innerHTML = '「' + p.name + '」<br>' +
+      (p.cost > 0 ? ('將扣除 ' + p.cost + ' 張印花') : '不扣印花，僅核對是否集齊');
+
+    var plan = planConsume(u.cards || [], p.cost);
+    if (!plan){
+      cfChips.innerHTML = '<span class="chip dim">印花不足</span>';
+      cfWarn.style.display = 'none';
+      $('btnConfirmRedeem').disabled = true;
+      $('btnConfirmRedeem').textContent = '印花不足';
+      openSheet(sheetConfirm);
+      return;
+    }
+
+    var base = countCards(u.cards), chips = '', danger = false, ids = Object.keys(plan.used);
+    ids.forEach(function(id){
+      var after = (base[id] || 0) - plan.used[id];
+      var c = cardOf(id);
+      if (after === 0) danger = true;
+      chips += '<span class="chip' + (after === 0 ? ' dim' : '') + '">' +
+                 (c ? c.name : id) + ' ×' + plan.used[id] +
+                 (after === 0 ? '（唯一）' : '') +
+               '</span>';
+    });
+    cfChips.innerHTML = chips || '<span class="chip dim">不需扣卡</span>';
+
+    if (danger){
+      cfWarn.style.display = 'block';
+      cfWarn.textContent = '注意：標「唯一」的卡會從卡冊移走，該款在卡冊會變回未獲得。';
+    } else {
+      cfWarn.style.display = 'none';
+    }
+
+    $('btnConfirmRedeem').disabled = false;
+    $('btnConfirmRedeem').textContent = '確認兌換';
+    openSheet(sheetConfirm);
+  }
+
+  function openDone(p, code, exp){
+    dnSub.innerHTML = '「' + p.name + '」已加入兌換記錄';
+    dnCode.textContent = code;
+    var d = new Date(exp);
+    dnExp.textContent = '兌換碼有效期至 ' + d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日';
+    openSheet(sheetDone);
+  }
+
+  function doRedeem(){
+    var p = pendingPrize;
+    if (!p) return;
+    var users = readUsers(), u = users[currentUser];
+    if (!u) return;
+
+    if (redeemCount(u, p.id) >= p.per){ closeSheet(sheetConfirm); toast('此獎品已達兌換上限'); renderRedeem(); return; }
+
+    var plan = planConsume(u.cards || [], p.cost);
+    if (!plan){ closeSheet(sheetConfirm); toast('印花不足'); renderRedeem(); return; }
+
+    u.cards = plan.cards;
+    u.redeems = u.redeems || [];
+
+    var code = genCode(), exp = Date.now() + 30 * 24 * 3600 * 1000;
+    u.redeems.push({ pid: p.id, name: p.name, code: code, at: Date.now(), exp: exp, used: false });
+
+    writeUsers(users);
+    closeSheet(sheetConfirm);
+    openDone(p, code, exp);
+    renderRedeem();
+    renderMain();
+  }
+
+  function openRecords(){
+    var users = readUsers(), u = users[currentUser];
+    u.redeems = (u && u.redeems) || [];
+    if (!u.redeems.length){
+      recList.innerHTML = '<div class="emptyrec">還沒有兌換記錄</div>';
+    } else {
+      var html = '';
+      u.redeems.slice().reverse().forEach(function(r){
+        var d = new Date(r.at);
+        html += '<div class="rec">' +
+                  '<div><div class="rn">' + r.name + '</div>' +
+                  '<div class="rm">' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) +
+                    '-' + ('0' + d.getDate()).slice(-2) + ' · 未使用</div></div>' +
+                  '<div class="rc">' + r.code + '</div>' +
+                '</div>';
+      });
+      recList.innerHTML = html;
+    }
+    openSheet(sheetRecords);
+  }
+
+  /* ---------- 綁定 ---------- */
+  prizeList.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.pbtn') : null;
+    if (!b || b.disabled) return;
+    var pid = b.getAttribute('data-pid'), p = null;
+    PRIZES.forEach(function(x){ if (x.id === pid) p = x; });
+    if (p) openConfirm(p);
+  });
+
+  $('btnConfirmRedeem').addEventListener('click', doRedeem);
+  $('btnCancelRedeem').addEventListener('click', function(){ closeSheet(sheetConfirm); });
+  $('btnDoneClose').addEventListener('click', function(){
+    closeSheet(sheetDone);
+    showScreen(scrMain);
+  });
+  $('btnRecords').addEventListener('click', openRecords);
+  $('btnRecClose').addEventListener('click', function(){ closeSheet(sheetRecords); });
+
+  [sheetConfirm, sheetDone, sheetRecords].forEach(function(sh){
+    sh.addEventListener('click', function(e){ if (e.target === sh) closeSheet(sh); });
+  });
+
+  /* ================= 主界面動作 ================= */
+  $('btnRedeem').addEventListener('click', function(){
+    renderRedeem();
+    showScreen(scrRedeem);
+  });
+  $('btnBackRedeem').addEventListener('click', function(){ showScreen(scrMain); });
   $('btnSwap').addEventListener('click', function(){ toast('交換功能即將開放'); });
 
   /* ================= 登出 ================= */
