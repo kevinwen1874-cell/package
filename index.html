@@ -137,8 +137,7 @@
     background:repeating-linear-gradient(45deg,#2A1E19 0 9px,#332520 9px 18px);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
   }
-  .slot.locked b{font-size:46px;font-weight:900;line-height:1;color:rgba(255,206,120,.34);letter-spacing:.04em;}
-  .slot.locked i{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.18em;color:rgba(255,206,120,.52);}
+  .slot.locked b{font-size:58px;font-weight:900;line-height:1;color:rgba(255,206,120,.34);letter-spacing:.04em;}
   .lk-tag{
     position:absolute;top:9px;left:9px;padding:3px 10px;border-radius:10px;background:var(--gold);
     color:#fff;font-size:10px;font-weight:900;letter-spacing:.16em;text-indent:.16em;border:2px solid var(--ink);
@@ -152,10 +151,17 @@
   }
   .cardname{margin:7px 2px 0;font-size:11.5px;font-weight:800;color:#7d706a;letter-spacing:.02em;text-align:center;}
 
-  .placeholder{
-    margin-top:22px;padding:20px 16px;border:3px dashed rgba(34,23,19,.24);border-radius:18px;
-    text-align:center;color:#a1938c;font-size:12.5px;font-weight:800;line-height:1.9;letter-spacing:.05em;
+  /* 主界面動作按鈕：兌換 / 交換 */
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;}
+  .act{
+    padding:19px 6px;border:3px solid var(--ink);border-radius:18px;
+    font:inherit;font-size:16px;font-weight:900;letter-spacing:.02em;
+    box-shadow:0 6px 0 var(--ink);cursor:pointer;
+    transition:transform .1s,box-shadow .1s,background .15s;
   }
+  .act:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink);}
+  .act-redeem{background:var(--red);color:#fff;}
+  .act-swap{background:var(--white);color:var(--ink);}
 
   /* ---------- 發卡預覽 ---------- */
   .reveal{
@@ -280,9 +286,9 @@
 
       <div class="album" id="album"></div>
 
-      <div class="placeholder" id="ruleNote">
-        主活動界面設計中<br>
-        兌換、交換、抽卡任務將在這裡開啟
+      <div class="actions">
+        <button class="act act-redeem" id="btnRedeem" type="button">兌換獎品！</button>
+        <button class="act act-swap" id="btnSwap" type="button">交換卡片！</button>
       </div>
     </div>
   </section>
@@ -473,7 +479,6 @@
           html += '<div class="slot locked">' +
                     '<span class="lk-tag">隱藏款</span>' +
                     '<b>？</b>' +
-                    '<i>' + c.name + ' · 尚未解鎖</i>' +
                   '</div>';
         }
         return;
@@ -490,9 +495,6 @@
     });
     album.innerHTML = html;
     progressEl.textContent = got + ' / ' + CARDS.length;
-
-    var rule = (DRAW_RULE === 'daily') ? '每天登入可抽取一張印花卡' : '每次登入可抽取一張印花卡';
-    $('ruleNote').innerHTML = rule + '<br>主活動界面設計中<br>兌換 · 交換 · 抽卡任務將在這裡開啟';
   }
 
   /* ================= 抽卡 ================= */
@@ -629,6 +631,10 @@
       if (v !== el.value) el.value = v;
     });
   });
+
+  /* ================= 主界面動作（尚未實作，先給回饋） ================= */
+  $('btnRedeem').addEventListener('click', function(){ toast('兌換功能即將開放'); });
+  $('btnSwap').addEventListener('click', function(){ toast('交換功能即將開放'); });
 
   /* ================= 登出 ================= */
   btnLogout.addEventListener('click', function(){
