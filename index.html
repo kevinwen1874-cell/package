@@ -262,6 +262,67 @@
 
   .ruleline{margin:15px 4px 0;font-size:11px;font-weight:800;color:#9a8d86;line-height:1.8;letter-spacing:.02em;text-align:center;}
 
+  /* ---------- 交換卡片頁 ---------- */
+  #scrSwap .wrap{margin:0 auto;}
+
+  .swtabs{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;
+    border:3px solid var(--ink);border-radius:16px;background:#EFE7DC;
+    box-shadow:0 5px 0 var(--ink);margin-bottom:14px;
+  }
+  .swtab{
+    padding:11px 4px;border:0;border-radius:11px;background:transparent;
+    font:inherit;font-size:13.5px;font-weight:900;letter-spacing:.06em;color:#8f827b;
+    cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;
+  }
+  .swtab.on{background:var(--white);color:var(--ink);box-shadow:0 2px 0 rgba(34,23,19,.16);}
+
+  .swpane{display:none;}
+  .swpane.on{display:block;}
+
+  .pickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .pickcard{
+    position:relative;padding:0;border:3px solid rgba(34,23,19,.22);border-radius:12px;
+    background:#fff;overflow:hidden;cursor:pointer;
+    transition:transform .1s,border-color .15s,box-shadow .15s;
+  }
+  .pickcard img{width:100%;display:block;}
+  .pickcard:active{transform:scale(.97);}
+  .pickcard.on{border-color:var(--red);box-shadow:0 4px 0 var(--red);}
+  .pickcard .pnum{
+    position:absolute;top:4px;right:4px;min-width:22px;height:22px;padding:0 5px;border-radius:11px;
+    background:var(--red);border:2px solid var(--ink);color:#fff;font-size:11px;font-weight:900;
+    display:grid;place-items:center;
+  }
+  .pickcard .tick{
+    position:absolute;left:0;right:0;bottom:0;padding:5px 0;text-align:center;
+    background:var(--red);color:#fff;font-size:11px;font-weight:900;letter-spacing:.14em;text-indent:.14em;
+  }
+
+  .pickinfo{
+    margin:13px 2px 0;padding:11px 13px;border:2.5px solid rgba(34,23,19,.15);border-radius:13px;
+    background:rgba(255,255,255,.62);font-size:12px;font-weight:800;line-height:1.65;
+    color:#7d706a;letter-spacing:.01em;min-height:48px;display:flex;align-items:center;
+  }
+  .pickinfo b{color:var(--ink);}
+  .pickinfo.hot{border-color:#EFD3AE;background:#FDF0E4;color:#8A5A16;}
+
+  .claim-in{
+    width:100%;padding:16px 10px;border:3px solid var(--ink);border-radius:16px;background:#fff;
+    font:inherit;font-size:22px;font-weight:900;letter-spacing:.16em;text-align:center;
+    text-transform:uppercase;color:var(--ink);outline:none;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .claim-in::placeholder{font-size:13px;letter-spacing:.1em;font-weight:800;color:#c0b4ae;}
+  .claim-in:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(227,36,18,.11);}
+
+  .swcard{
+    width:104px;margin:2px auto 0;display:block;border:3px solid var(--ink);border-radius:12px;
+    box-shadow:0 4px 0 var(--ink);background:#fff;
+  }
+  .swstep{margin:12px 0 0;font-size:11.5px;font-weight:800;color:#8c7f78;line-height:1.8;letter-spacing:.01em;}
+  .swstep b{color:var(--ink);}
+
   /* ---------- 底部彈層 ---------- */
   .sheet{
     position:fixed;inset:0;z-index:85;display:none;align-items:flex-end;justify-content:center;
@@ -408,6 +469,50 @@
     </div>
   </section>
 
+  <!-- ========== 4. 交換卡片 ========== -->
+  <section class="screen" id="scrSwap">
+    <div class="wrap">
+      <div class="subbar">
+        <button class="backbtn" id="btnBackSwap" type="button" aria-label="返回">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="t">交換卡片</div>
+        <button class="ghost" id="btnSwapLog" type="button">交換記錄</button>
+      </div>
+
+      <div class="swtabs">
+        <button class="swtab on" id="tabOut" type="button">送出卡片</button>
+        <button class="swtab" id="tabIn" type="button">領取卡片</button>
+      </div>
+
+      <!-- 送出 -->
+      <div class="swpane on" id="paneOut">
+        <div class="pickgrid" id="swapPick"></div>
+        <div class="pickinfo" id="swapInfo">請選擇要送出的卡片</div>
+        <button class="btn" id="btnMakeCode" type="button" style="margin-top:14px">生成交換碼</button>
+        <p class="ruleline">
+          選一張卡生成交換碼，把碼發給朋友<br>
+          對方輸入後即可領取，每組碼限用一次
+        </p>
+      </div>
+
+      <!-- 領取 -->
+      <div class="swpane" id="paneIn">
+        <div class="field" style="margin-bottom:0">
+          <label for="inSwap">輸入朋友給你的交換碼</label>
+          <input id="inSwap" class="claim-in" type="text" inputmode="text" autocomplete="off"
+                 autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH" maxlength="14">
+        </div>
+        <button class="btn" id="btnClaim" type="button" style="margin-top:14px">領取卡片</button>
+        <p class="ruleline">
+          交換碼 7 天內有效，每組限用一次<br>
+          領取後卡片直接收入你的卡冊
+        </p>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <!-- ========== 3. 發卡放大預覽 ========== -->
@@ -463,6 +568,53 @@
   </div>
 </div>
 
+<!-- ========== 5. 交換彈層 ========== -->
+<div class="sheet" id="sheetSwapOut">
+  <div class="sheet-box">
+    <h3>確認送出</h3>
+    <img class="swcard" id="soCard" src="" alt="">
+    <p class="ssub" id="soSub" style="margin-top:12px;text-align:center"></p>
+    <div class="warn" id="soWarn" style="display:none"></div>
+    <button class="btn" id="btnConfirmSend" type="button">確認送出並生成交換碼</button>
+    <button class="btn" id="btnCancelSend" type="button"
+            style="background:#fff;color:#221713;margin-top:9px">再想想</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheetSwapCode">
+  <div class="sheet-box">
+    <h3>交換碼已生成</h3>
+    <p class="ssub" id="scSub">把下面的碼發給朋友，對方在「領取卡片」輸入即可。</p>
+    <div class="codebox">
+      <div class="k">交換碼</div>
+      <div class="v" id="scCode">—</div>
+    </div>
+    <p class="ssub" id="scExp" style="margin-top:11px;text-align:center"></p>
+    <button class="btn" id="btnCopyCode" type="button" style="margin-top:14px">複製交換碼</button>
+    <button class="btn" id="btnCodeClose" type="button"
+            style="background:#fff;color:#221713;margin-top:9px">完成</button>
+    <p class="swstep" id="scTip"></p>
+  </div>
+</div>
+
+<div class="sheet" id="sheetClaimDone">
+  <div class="sheet-box">
+    <h3 id="cdTitle">領取成功</h3>
+    <img class="swcard" id="cdCard" src="" alt="">
+    <p class="ssub" id="cdSub" style="margin-top:12px;text-align:center"></p>
+    <button class="btn" id="btnClaimClose" type="button" style="margin-top:14px">回我的卡冊</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheetSwapLog">
+  <div class="sheet-box">
+    <h3>交換記錄</h3>
+    <p class="ssub">送出的碼若還沒被領取，可再複製給朋友</p>
+    <div class="reclist" id="swLogList"></div>
+    <button class="btn" id="btnSwapLogClose" type="button">關閉</button>
+  </div>
+</div>
+
 <script>
 (function(){
   'use strict';
@@ -509,7 +661,7 @@
 
   /* ================= DOM ================= */
   var $ = function(id){ return document.getElementById(id); };
-  var scrAuth=$('scrAuth'), scrMain=$('scrMain'), scrRedeem=$('scrRedeem');
+  var scrAuth=$('scrAuth'), scrMain=$('scrMain'), scrRedeem=$('scrRedeem'), scrSwap=$('scrSwap');
   var inPhone=$('inPhone'), inCode=$('inCode');
   var btnSendCode=$('btnSendCode'), codeHint=$('codeHint');
   var btnSubmit=$('btnSubmit'), msgEl=$('msg');
@@ -521,6 +673,17 @@
   var cfSub=$('cfSub'), cfChips=$('cfChips'), cfWarn=$('cfWarn');
   var dnSub=$('dnSub'), dnCode=$('dnCode'), dnExp=$('dnExp'), recList=$('recList');
   var toastEl=$('toast'), toastTimer=null;
+
+  /* 交換相關 DOM */
+  var swapPick=$('swapPick'), swapInfo=$('swapInfo');
+  var paneOut=$('paneOut'), paneIn=$('paneIn'), tabOut=$('tabOut'), tabIn=$('tabIn');
+  var inSwap=$('inSwap');
+  var sheetSwapOut=$('sheetSwapOut'), sheetSwapCode=$('sheetSwapCode');
+  var sheetClaimDone=$('sheetClaimDone'), sheetSwapLog=$('sheetSwapLog');
+  var soCard=$('soCard'), soSub=$('soSub'), soWarn=$('soWarn');
+  var scSub=$('scSub'), scCode=$('scCode'), scExp=$('scExp'), scTip=$('scTip');
+  var cdTitle=$('cdTitle'), cdCard=$('cdCard'), cdSub=$('cdSub');
+  var swLogList=$('swLogList');
 
   var currentUser = '';
 
@@ -602,7 +765,7 @@
 
   /* ================= 屏幕切換 ================= */
   function showScreen(el){
-    [scrAuth, scrMain, scrRedeem].forEach(function(s){ s.classList.toggle('on', s === el); });
+    [scrAuth, scrMain, scrRedeem, scrSwap].forEach(function(s){ s.classList.toggle('on', s === el); });
     $('stage').scrollTop = 0;
   }
 
@@ -1053,20 +1216,300 @@
     sh.addEventListener('click', function(e){ if (e.target === sh) closeSheet(sh); });
   });
 
+  /* ================= 交換卡片（交換碼） ================= */
+  /* 流程：選一張卡 → 立即扣卡 → 生成一次性交換碼（7 天有效）
+     對方登入後在「領取卡片」輸入該碼 → 卡片入冊、碼即失效。
+     交換碼池存在 K_SWAPS（同一個瀏覽器共享），所以同一部機的兩個帳號可以完整走通；
+     要跨裝置生效，只需把 readSwaps / writeSwaps 換成後端 API，其餘邏輯不用改。 */
+  var K_SWAPS    = 'wanxia.swaps.v1';
+  var SWAP_TTL   = 7 * 24 * 3600 * 1000;
+  var SWAP_ALPHA = 'ACDEFGHJKLMNPQRTUVWXY34679';
+
+  function readSwaps(){
+    try { return JSON.parse(localStorage.getItem(K_SWAPS) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function writeSwaps(s){
+    try { localStorage.setItem(K_SWAPS, JSON.stringify(s)); } catch(e){}
+  }
+
+  function rawSwapCode(){
+    var s = '';
+    for (var i = 0; i < 8; i++) s += SWAP_ALPHA.charAt(Math.floor(Math.random() * SWAP_ALPHA.length));
+    return s;
+  }
+  function genSwapCode(){
+    var pool = readSwaps(), raw = rawSwapCode();
+    for (var t = 0; t < 40 && pool['SW-' + raw.slice(0,4) + '-' + raw.slice(4)]; t++) raw = rawSwapCode();
+    return 'SW-' + raw.slice(0, 4) + '-' + raw.slice(4);
+  }
+
+  /* 輸入正規化：去掉 SW 前綴與非字母數字，只留 8 位內容 */
+  function normSwap(v){
+    var s = (v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (s.slice(0, 2) === 'SW') s = s.slice(2);
+    return s.slice(0, 8);
+  }
+  function fmtSwap(s){ return s.length > 4 ? s.slice(0, 4) + '-' + s.slice(4) : s; }
+
+  var pickedId = null;
+
+  function swapTab(which){
+    var out = (which === 'out');
+    tabOut.classList.toggle('on', out);
+    tabIn.classList.toggle('on', !out);
+    paneOut.classList.toggle('on', out);
+    paneIn.classList.toggle('on', !out);
+    if (!out) setTimeout(function(){ try { inSwap.focus(); } catch(e){} }, 80);
+  }
+
+  function renderSwap(){
+    var users = readUsers(), u = users[currentUser];
+    if (!u) return;
+    u.cards = u.cards || [];
+    var cnt = countCards(u.cards);
+
+    var html = '', n = 0;
+    CARDS.forEach(function(c){
+      if (!drawable(c)) return;               // 卡面未就緒的款式不參與交換
+      var k = cnt[c.id] || 0;
+      if (k <= 0) return;
+      n++;
+      html += '<button class="pickcard' + (pickedId === c.id ? ' on' : '') + '" type="button" data-cid="' + c.id + '">' +
+                '<img src="' + c.thumb + '" alt="' + c.name + '">' +
+                (k > 1 ? '<span class="pnum">×' + k + '</span>' : '') +
+                (pickedId === c.id ? '<span class="tick">已選</span>' : '') +
+              '</button>';
+    });
+    swapPick.innerHTML = n ? html :
+      '<div class="emptyrec" style="grid-column:1/-1">卡冊還沒有卡片，先去抽一張</div>';
+
+    var btn = $('btnMakeCode');
+    if (!pickedId || !(cnt[pickedId] > 0)){
+      pickedId = null;
+      swapInfo.className = 'pickinfo';
+      swapInfo.textContent = n ? '請選擇要送出的卡片' : '卡冊還沒有可送出的卡片';
+      btn.disabled = true;
+      return;
+    }
+    var c = cardOf(pickedId), k2 = cnt[pickedId];
+    btn.disabled = false;
+    if (k2 > 1){
+      swapInfo.className = 'pickinfo';
+      swapInfo.innerHTML = '<span>送出 <b>1 張「' + c.name + '」</b> · 送出後卡冊還剩 ' + (k2 - 1) + ' 張</span>';
+    } else {
+      swapInfo.className = 'pickinfo hot';
+      swapInfo.innerHTML = '<span>「' + c.name + '」你只有 1 張，送出後該格會變回未獲得</span>';
+    }
+  }
+
+  function openSwapOut(){
+    var users = readUsers(), u = users[currentUser];
+    if (!u) return;
+    var cnt = countCards(u.cards || []);
+    if (!pickedId || !(cnt[pickedId] > 0)){ toast('請先選擇卡片'); renderSwap(); return; }
+
+    var c = cardOf(pickedId), k = cnt[pickedId];
+    soCard.src = c.thumb;
+    soCard.alt = c.name;
+    soSub.innerHTML = '「' + c.name + '」送出 <b>1 張</b>' +
+      (k > 1 ? ('<br>送出後卡冊還剩 ' + (k - 1) + ' 張') : '<br>送出後卡冊不再持有此款');
+
+    if (k <= 1){
+      soWarn.style.display = 'block';
+      soWarn.textContent = '注意：這是你唯一的一張，送出後卡冊該格會變回未獲得。';
+    } else {
+      soWarn.style.display = 'none';
+    }
+    openSheet(sheetSwapOut);
+  }
+
+  function doSend(){
+    var users = readUsers(), u = users[currentUser];
+    if (!u || !pickedId) return;
+    u.cards = u.cards || [];
+    var i = u.cards.indexOf(pickedId);
+    if (i < 0){ closeSheet(sheetSwapOut); toast('卡片不足'); renderSwap(); return; }
+
+    var cardId = pickedId;
+    u.cards.splice(i, 1);
+
+    var code = genSwapCode(), exp = Date.now() + SWAP_TTL;
+    var pool = readSwaps();
+    pool[code] = { cardId: cardId, from: currentUser, fromMask: maskPhone(currentUser),
+                   at: Date.now(), exp: exp, used: null };
+    writeSwaps(pool);
+
+    u.swaps = u.swaps || [];
+    u.swaps.push({ dir:'out', cardId: cardId, code: code, at: Date.now(), other: '' });
+    writeUsers(users);
+
+    pickedId = null;
+    closeSheet(sheetSwapOut);
+    renderSwap();
+    renderMain();
+    openSwapCode(code, exp, cardId);
+  }
+
+  function openSwapCode(code, exp, cardId){
+    var c = cardOf(cardId);
+    scSub.innerHTML = '「' + (c ? c.name : cardId) + '」已從你的卡冊移出<br>' +
+                      '把碼發給朋友，對方在「領取卡片」輸入即可。';
+    scCode.textContent = code;
+    var d = new Date(exp);
+    scExp.textContent = '有效期至 ' + d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日';
+    scTip.innerHTML = '每組碼只可使用一次。若朋友遲遲未領，可到「交換記錄」找回此碼。';
+    openSheet(sheetSwapCode);
+  }
+
+  function copyText(t){
+    var done = function(ok){ toast(ok ? '已複製交換碼' : '複製失敗，請長按選取'); };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){ done(false); });
+      return;
+    }
+    var ta = document.createElement('textarea');
+    ta.value = t;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+    done(ok);
+  }
+
+  function doClaim(){
+    var raw = normSwap(inSwap.value);
+    if (raw.length !== 8) return toast('請輸入 8 位交換碼');
+
+    var code = 'SW-' + fmtSwap(raw);
+    var pool = readSwaps(), rec = pool[code];
+    if (!rec) return toast('找不到此交換碼，請再核對');
+    if (rec.used) return toast('此交換碼已被使用');
+    if (rec.exp && Date.now() > rec.exp) return toast('此交換碼已過期');
+    if (rec.from === currentUser) return toast('這是你自己發出的交換碼');
+
+    var users = readUsers(), u = users[currentUser];
+    if (!u) return;
+    u.cards = u.cards || [];
+
+    var had = (countCards(u.cards)[rec.cardId] || 0) > 0;
+    u.cards.push(rec.cardId);
+    u.swaps = u.swaps || [];
+    u.swaps.push({ dir:'in', cardId: rec.cardId, code: code, at: Date.now(), other: rec.fromMask || '' });
+
+    rec.used = { by: currentUser, at: Date.now() };
+    writeSwaps(pool);
+    writeUsers(users);
+
+    inSwap.value = '';
+    renderSwap();
+    renderMain();
+
+    var c = cardOf(rec.cardId);
+    cdCard.src = c ? c.thumb : '';
+    cdCard.alt = c ? c.name : '';
+    cdTitle.textContent = had ? '已收入卡冊' : '新卡入冊！';
+    cdSub.innerHTML = '「' + (c ? c.name : rec.cardId) + '」<br>' +
+      (had ? '你本來已有這款，現在多 1 張可以再換出去' : '這款你之前沒有，卡冊已點亮') +
+      (rec.fromMask ? '<br><span style="font-size:10.5px;color:#9a8d86">來自 ' + rec.fromMask + '</span>' : '');
+    openSheet(sheetClaimDone);
+  }
+
+  function openSwapLog(){
+    var users = readUsers(), u = users[currentUser];
+    var pool = readSwaps();
+    var list = (u && u.swaps) ? u.swaps.slice().reverse() : [];
+
+    if (!list.length){
+      swLogList.innerHTML = '<div class="emptyrec">還沒有交換記錄</div>';
+    } else {
+      var html = '';
+      list.forEach(function(s){
+        var c = cardOf(s.cardId), nm = c ? c.name : s.cardId;
+        var d = new Date(s.at);
+        var date = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+        if (s.dir === 'out'){
+          var rec = pool[s.code] || {};
+          var st = rec.used ? '已領取' : ((rec.exp && Date.now() > rec.exp) ? '已過期' : '待領取');
+          html += '<div class="rec">' +
+                    '<div><div class="rn">送出 · ' + nm + '</div>' +
+                    '<div class="rm">' + date + ' · ' + st + '</div></div>' +
+                    '<div class="rc">' + s.code + '</div>' +
+                  '</div>';
+        } else {
+          html += '<div class="rec">' +
+                    '<div><div class="rn">收到 · ' + nm + '</div>' +
+                    '<div class="rm">' + date + (s.other ? (' · 來自 ' + s.other) : '') + '</div></div>' +
+                    '<div class="rc" style="color:#1D7B3E">已入冊</div>' +
+                  '</div>';
+        }
+      });
+      swLogList.innerHTML = html;
+    }
+    openSheet(sheetSwapLog);
+  }
+
+  /* ---------- 交換綁定 ---------- */
+  swapPick.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.pickcard') : null;
+    if (!b) return;
+    var cid = b.getAttribute('data-cid');
+    pickedId = (pickedId === cid) ? null : cid;
+    renderSwap();
+  });
+
+  tabOut.addEventListener('click', function(){ swapTab('out'); });
+  tabIn.addEventListener('click', function(){ swapTab('in'); });
+
+  $('btnMakeCode').addEventListener('click', openSwapOut);
+  $('btnConfirmSend').addEventListener('click', doSend);
+  $('btnCancelSend').addEventListener('click', function(){ closeSheet(sheetSwapOut); });
+  $('btnCopyCode').addEventListener('click', function(){ copyText(scCode.textContent); });
+  $('btnCodeClose').addEventListener('click', function(){ closeSheet(sheetSwapCode); });
+  $('btnClaim').addEventListener('click', doClaim);
+  $('btnClaimClose').addEventListener('click', function(){
+    closeSheet(sheetClaimDone);
+    showScreen(scrMain);
+  });
+  $('btnSwapLog').addEventListener('click', openSwapLog);
+  $('btnSwapLogClose').addEventListener('click', function(){ closeSheet(sheetSwapLog); });
+  $('btnBackSwap').addEventListener('click', function(){ showScreen(scrMain); });
+
+  inSwap.addEventListener('input', function(){
+    inSwap.value = fmtSwap(normSwap(inSwap.value));
+  });
+  inSwap.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') doClaim();
+  });
+
+  [sheetSwapOut, sheetSwapCode, sheetClaimDone, sheetSwapLog].forEach(function(sh){
+    sh.addEventListener('click', function(e){ if (e.target === sh) closeSheet(sh); });
+  });
+
   /* ================= 主界面動作 ================= */
   $('btnRedeem').addEventListener('click', function(){
     renderRedeem();
     showScreen(scrRedeem);
   });
   $('btnBackRedeem').addEventListener('click', function(){ showScreen(scrMain); });
-  $('btnSwap').addEventListener('click', function(){ toast('交換功能即將開放'); });
+  $('btnSwap').addEventListener('click', function(){
+    pickedId = null;
+    renderSwap();
+    swapTab('out');
+    showScreen(scrSwap);
+  });
 
   /* ================= 登出 ================= */
   btnLogout.addEventListener('click', function(){
     setCur('');
     currentUser = '';
+    pickedId = null;
     inPhone.value = '';
     inCode.value = '';
+    inSwap.value = '';
     sent = { phone:'', code:'', exp:0 };
     codeHint.classList.remove('on');
     codeHint.textContent = '';
