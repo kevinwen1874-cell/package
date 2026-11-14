@@ -106,9 +106,28 @@
   .fineprint{margin:18px 0 0;text-align:center;font-size:11px;line-height:1.7;color:#9a8d86;font-weight:700;letter-spacing:.03em;}
 
   /* ---------- 主界面 ---------- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:20px;}
   .topbar .t{font-size:17px;font-weight:900;letter-spacing:.15em;}
-  .who{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;margin-top:3px;}
+  .who{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;margin-top:3px;white-space:nowrap;}
+  /* 窄屏（≤389px）讓「· 已登入」讓位，避免手機號掩碼被折成兩行 */
+  @media (max-width:389px){ .who .ws{display:none;} }
+
+  /* 登出左側：官方網店入口 */
+  .topbar-r{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
+  .shoplink{
+    display:flex;align-items:center;gap:5px;flex:0 0 auto;text-decoration:none;
+    padding:5px 6px 5px 9px;border:2.5px solid var(--ink);border-radius:12px;
+    background:#FFF6E4;box-shadow:0 3px 0 var(--ink);color:var(--ink);cursor:pointer;
+    transition:transform .1s,box-shadow .1s;
+  }
+  .shoplink:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink);}
+  .sl-txt{font-size:9.5px;font-weight:900;line-height:1.45;letter-spacing:.01em;text-align:right;}
+  .sl-arrow{font-size:10px;font-weight:900;color:var(--red);line-height:1;}
+  .sl-ico{
+    flex:0 0 26px;width:26px;height:26px;border-radius:8px;background:var(--red);
+    border:2px solid var(--ink);display:grid;place-items:center;
+  }
+  .sl-ico svg{width:15px;height:15px;display:block;}
   .ghost{
     padding:9px 14px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;
     font:inherit;font-size:12.5px;font-weight:900;letter-spacing:.1em;color:var(--ink);cursor:pointer;
@@ -426,7 +445,20 @@
           <div class="t">丸俠集卡</div>
           <div class="who" id="whoAmI">—</div>
         </div>
-        <button class="ghost" id="btnLogout" type="button">登出</button>
+        <div class="topbar-r">
+          <a class="shoplink" id="lnkShop" href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer">
+            <span class="sl-txt">想了解更多振興產品？<br>歡迎來我們網店選購！</span>
+            <span class="sl-arrow">➡</span>
+            <span class="sl-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"
+                   stroke-linejoin="round" stroke-linecap="round">
+                <path d="M5.6 8.2h12.8l-1.1 11.6H6.7z"/>
+                <path d="M9.2 8.2V6.5a2.8 2.8 0 0 1 5.6 0v1.7"/>
+              </svg>
+            </span>
+          </a>
+          <button class="ghost" id="btnLogout" type="button">登出</button>
+        </div>
       </div>
 
       <div class="sec-title">
@@ -775,7 +807,7 @@
     var u = users[currentUser];
     if (!u) return;
 
-    whoAmI.textContent = maskPhone(currentUser) + ' · 已登入';
+    whoAmI.innerHTML = '<span class="wm">' + maskPhone(currentUser) + '</span><span class="ws"> · 已登入</span>';
 
     var count = {};
     (u.cards || []).forEach(function(id){ count[id] = (count[id] || 0) + 1; });
