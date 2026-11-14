@@ -129,6 +129,22 @@
   }
   .slot.empty b{font-size:38px;font-weight:900;color:rgba(34,23,19,.155);line-height:1;letter-spacing:.02em;}
   .slot.empty i{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.16em;color:rgba(34,23,19,.28);}
+
+  /* 隱藏款卡位：獨佔一行，深底斜紋 + 描金標籤 */
+  .slot.locked{
+    grid-column:1 / -1;aspect-ratio:900/380;border:3px solid var(--ink);border-radius:15px;
+    box-shadow:0 5px 0 var(--ink);overflow:hidden;position:relative;
+    background:repeating-linear-gradient(45deg,#2A1E19 0 9px,#332520 9px 18px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  }
+  .slot.locked b{font-size:46px;font-weight:900;line-height:1;color:rgba(255,206,120,.34);letter-spacing:.04em;}
+  .slot.locked i{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.18em;color:rgba(255,206,120,.52);}
+  .lk-tag{
+    position:absolute;top:9px;left:9px;padding:3px 10px;border-radius:10px;background:var(--gold);
+    color:#fff;font-size:10px;font-weight:900;letter-spacing:.16em;text-indent:.16em;border:2px solid var(--ink);
+  }
+  .slot.got.wide{grid-column:1 / -1;aspect-ratio:900/380;}
+  .slot.got.wide img{object-fit:cover;}
   .slot .num{
     position:absolute;top:7px;right:7px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;
     background:var(--red);border:2.5px solid var(--ink);color:#fff;font-size:12px;font-weight:900;
@@ -296,13 +312,20 @@
 (function(){
   'use strict';
 
-  /* ================= 卡池 ================= */
+  /* ================= 卡池（共 5 張：普通 ×2、稀有 ×2、隱藏 ×1） ================= */
   var CARDS = [
     { id:'A', name:'魚丸隊長 · 叉腰', rank:'普通', img:'assets/card_a.webp', thumb:'assets/thumb_a.webp' },
     { id:'B', name:'丸俠 · 蓄力',     rank:'普通', img:'assets/card_b.webp', thumb:'assets/thumb_b.webp' },
     { id:'C', name:'魚丸隊長 · 騰空', rank:'稀有', img:'assets/card_c.webp', thumb:'assets/thumb_c.webp' },
-    { id:'D', name:'丸俠 · 展翅',     rank:'稀有', img:'assets/card_d.webp', thumb:'assets/thumb_d.webp' }
+    { id:'D', name:'丸俠 · 展翅',     rank:'稀有', img:'assets/card_d.webp', thumb:'assets/thumb_d.webp' },
+    /* ★ 隱藏款：雙角色同框。卡面圖未出，ready:false ⇒ 卡冊照樣顯示第 5 格（鎖定態）、但不進入抽卡池。
+       出圖後把 card_e.webp / thumb_e.webp 放進 assets，並把 ready 改成 true 即可啟用。 */
+    { id:'E', name:'雙雄同框', rank:'隱藏', ready:false,
+      img:'assets/card_e.webp', thumb:'assets/thumb_e.webp' }
   ];
+
+  /* 隱藏款是否可抽（等卡面圖就緒才開） */
+  function drawable(c){ return c.ready !== false; }
 
   /* 發卡規則：'every-login' 每次登入發一張；'daily' 每天最多一張 */
   var DRAW_RULE = 'every-login';
@@ -438,6 +461,23 @@
     var got = 0, html = '';
     CARDS.forEach(function(c){
       var n = count[c.id] || 0;
+      var wide = (c.id === 'E') ? ' wide' : '';
+      if (c.id === 'E'){
+        if (n > 0 && drawable(c)){
+          got++;
+          html += '<div class="slot got wide">' +
+                    '<img src="' + c.thumb + '" alt="' + c.name + '">' +
+                    (n > 1 ? '<div class="num">×' + n + '</div>' : '') +
+                  '</div>';
+        } else {
+          html += '<div class="slot locked">' +
+                    '<span class="lk-tag">隱藏款</span>' +
+                    '<b>？</b>' +
+                    '<i>' + c.name + ' · 尚未解鎖</i>' +
+                  '</div>';
+        }
+        return;
+      }
       if (n > 0) {
         got++;
         html += '<div class="slot got">' +
@@ -459,6 +499,7 @@
   function drawCard(owned){
     var pool = [];
     CARDS.forEach(function(c){
+      if (!drawable(c)) return;                 // 隱藏款卡面未就緒，暫不入池
       var w = (owned && owned[c.id]) ? W_OWNED : W_NEW;
       for (var i=0;i<w;i++) pool.push(c);
     });
