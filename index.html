@@ -237,7 +237,7 @@
 
   .prize{
     display:flex;align-items:center;gap:12px;padding:12px;border:3px solid var(--ink);border-radius:16px;
-    background:var(--white);box-shadow:0 4px 0 var(--ink);margin-bottom:10px;
+    background:var(--white);box-shadow:0 4px 0 var(--ink);margin-bottom:10px;min-height:88px;
   }
   .prize.off{box-shadow:0 4px 0 rgba(34,23,19,.28);}
   .prize.off .pico,.prize.off .pname,.prize.off .pmeta{opacity:.55;}
@@ -912,16 +912,16 @@
 
       var noteTxt = p.note;
       if (p.need === 'all'){
-        var kinds = 0;
-        CARDS.forEach(function(c){ if ((cnt[c.id] || 0) > 0) kinds++; });
-        noteTxt = '含隱藏款 · 已集 ' + kinds + ' / ' + CARDS.length + ' 款';
+        // 只留一行條件，不顯示集卡進度
+        needTxt = '需集齊所有 ' + CARDS.length + ' 張卡片！';
+        noteTxt = '';
       }
 
       html += '<div class="prize' + (st.ok ? '' : ' off') + '">' +
                 '<div class="pico">' + ICON[p.icon] + '</div>' +
                 '<div class="pbody">' +
                   '<div class="pname">' + p.name + '</div>' +
-                  '<div class="pmeta">' + needTxt + '<br>' + noteTxt + '</div>' +
+                  '<div class="pmeta">' + needTxt + (noteTxt ? '<br>' + noteTxt : '') + '</div>' +
                 '</div>' +
                 '<button class="pbtn' + (st.ok ? '' : ' off') + '" data-pid="' + p.id + '"' +
                   (st.ok ? '' : ' disabled') + '>' + st.label + '</button>' +
