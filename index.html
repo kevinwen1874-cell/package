@@ -325,7 +325,7 @@
       <div class="brand">
         <img class="brand-mascot" src="assets/mascot.webp" alt="丸俠">
         <h1>丸俠集卡</h1>
-        <div class="sub">大埔振興肉丸 · 集換式印花</div>
+        <div class="sub">大埔振興肉丸 · 集換式卡片</div>
       </div>
 
       <div class="panel">
@@ -353,7 +353,7 @@
         <div class="msg" id="msg"></div>
       </div>
 
-      <p class="fineprint">登入後系統將隨機發放一張可交換印花卡</p>
+      <p class="fineprint">登入後系統將隨機發放一張可交換卡片</p>
     </div>
   </section>
 
@@ -395,14 +395,14 @@
       </div>
 
       <div class="wallet">
-        <div class="num"><b id="wmTotal">0</b>張印花</div>
+        <div class="num"><b id="wmTotal">0</b>張卡片</div>
         <div class="sub" id="wmSub">重複卡可兌換<br>扣卡時優先扣重複</div>
       </div>
 
       <div id="prizeList"></div>
 
       <p class="ruleline">
-        兌換後印花即被扣除，兌換碼 30 天內有效<br>
+        兌換後卡片即被扣除，兌換碼 30 天內有效<br>
         到店出示兌換碼即可領取，每人每款限兌一次
       </p>
     </div>
@@ -787,7 +787,7 @@
 
   /* ================= 兌換獎品 ================= */
   /* 獎品設定（改這裡就能調獎品、門檻與限兌次數）
-     cost = 需要的印花張數（會扣卡，優先扣重複卡）
+     cost = 需要的卡片張數（會扣卡，優先扣重複卡）
      need = 額外門檻：'' 無／'all' 集齊全部款式（含隱藏款）／'full' 集齊 A–D／'hidden' 持有隱藏款
      per  = 每人限兌次數（0 = 不限次數）
      獎品一律不限庫存（不設「限量 N 份」） */
@@ -858,7 +858,7 @@
     if (p.need === 'all' && !hasAllSet(cnt)) return { ok:false, label:'未集齊' };
     if (p.need === 'full' && !hasFullSet(cnt)) return { ok:false, label:'未集齊' };
     if (p.need === 'hidden' && !(cnt.E > 0)) return { ok:false, label:'未有隱藏款' };
-    if (total < p.cost) return { ok:false, label:'印花不足' };
+    if (total < p.cost) return { ok:false, label:'卡片不足' };
     return { ok:true, label:'兌換' };
   }
 
@@ -906,9 +906,9 @@
     var html = '';
     PRIZES.forEach(function(p){
       var st = prizeStatus(u, p);
-      var needTxt = (p.cost > 0 ? ('需 ' + p.cost + ' 張印花') : '免印花') + ' · 不限量';
-      if (p.need === 'full') needTxt = '集齊 A–D 四款 · 不限量';
-      if (p.need === 'hidden') needTxt = '需持有隱藏款 · 不限量';
+      var needTxt = (p.cost > 0) ? ('需 ' + p.cost + ' 張卡片') : '不需卡片';
+      if (p.need === 'full') needTxt = '集齊 A–D 四款';
+      if (p.need === 'hidden') needTxt = '需持有隱藏款';
 
       var noteTxt = p.note;
       if (p.need === 'all'){
@@ -942,14 +942,14 @@
     pendingPrize = p;
 
     cfSub.innerHTML = '「' + p.name + '」<br>' +
-      (p.cost > 0 ? ('將扣除 ' + p.cost + ' 張印花') : '不扣印花，僅核對是否集齊');
+      (p.cost > 0 ? ('將扣除 ' + p.cost + ' 張卡片') : '不需扣卡，僅核對是否集齊');
 
     var plan = planConsume(u.cards || [], p.cost);
     if (!plan){
-      cfChips.innerHTML = '<span class="chip dim">印花不足</span>';
+      cfChips.innerHTML = '<span class="chip dim">卡片不足</span>';
       cfWarn.style.display = 'none';
       $('btnConfirmRedeem').disabled = true;
-      $('btnConfirmRedeem').textContent = '印花不足';
+      $('btnConfirmRedeem').textContent = '卡片不足';
       openSheet(sheetConfirm);
       return;
     }
@@ -995,7 +995,7 @@
     if (redeemCount(u, p.id) >= p.per){ closeSheet(sheetConfirm); toast('此獎品已達兌換上限'); renderRedeem(); return; }
 
     var plan = planConsume(u.cards || [], p.cost);
-    if (!plan){ closeSheet(sheetConfirm); toast('印花不足'); renderRedeem(); return; }
+    if (!plan){ closeSheet(sheetConfirm); toast('卡片不足'); renderRedeem(); return; }
 
     u.cards = plan.cards;
     u.redeems = u.redeems || [];
