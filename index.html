@@ -788,18 +788,24 @@
   /* ================= 兌換獎品 ================= */
   /* 獎品設定（改這裡就能調獎品、門檻與限兌次數）
      cost = 需要的印花張數（會扣卡，優先扣重複卡）
-     need = 額外門檻：'' 無／'full' 集齊 A–D 四款／'hidden' 持有隱藏款
-     per  = 每人限兌次數 */
+     need = 額外門檻：'' 無／'all' 集齊全部款式（含隱藏款）／'full' 集齊 A–D／'hidden' 持有隱藏款
+     per  = 每人限兌次數（0 = 不限次數）
+     獎品一律不限庫存（不設「限量 N 份」） */
   var PRIZES = [
-    { id:'p1', name:'丸俠貼紙包',          cost:2, need:'',     per:2, quota:'限量 50 份', note:'內含 6 張角色貼紙',      icon:'sticker' },
-    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',     per:1, quota:'限量 30 份', note:'全線門市通用，不設找續',  icon:'ticket'  },
-    { id:'p3', name:'丸俠保溫袋',          cost:6, need:'',     per:1, quota:'限量 15 份', note:'活動限定，換完即止',      icon:'gift'     },
-    { id:'p4', name:'限定收藏卡冊',        cost:0, need:'full', per:1, quota:'限量 20 份', note:'集齊 A–D 四款卡即可換領', icon:'album'   }
+    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',    per:1, note:'全線門市通用，不設找續',                icon:'ticket' },
+    { id:'p4', name:'限定丸俠公仔',        cost:0, need:'all', per:1, note:'需集齊全部 5 款，含隱藏款', icon:'doll'   }
   ];
 
   var ICON = {
-    sticker:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.2" stroke-linejoin="round">' +
-            '<rect x="2.6" y="2.6" width="11" height="11" rx="2"/><rect x="10.4" y="10.4" width="11" height="11" rx="2"/></svg>',
+    doll:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.1" stroke-linejoin="round">' +
+         '<circle cx="12" cy="9.4" r="6.4"/>' +
+         '<path d="M5.5 11.4c-1.9.6-2.9 2-3.2 3.5" stroke-linecap="round"/>' +
+         '<path d="M18.5 11.4c1.9.6 2.9 2 3.2 3.5" stroke-linecap="round"/>' +
+         '<path d="M9.1 15.1c-.7 1.4-1.1 2.9-1.1 4.2" stroke-linecap="round"/>' +
+         '<path d="M14.9 15.1c.7 1.4 1.1 2.9 1.1 4.2" stroke-linecap="round"/>' +
+         '<circle cx="9.9" cy="8.6" r=".9" fill="#221713" stroke="none"/>' +
+         '<circle cx="14.1" cy="8.6" r=".9" fill="#221713" stroke="none"/>' +
+         '<path d="M10.1 11.3c1.2 1.2 2.6 1.2 3.8 0" stroke-linecap="round"/></svg>',
     ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="#221713" stroke-width="2.2" stroke-linejoin="round">' +
            '<path d="M3 8.4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1.8a1.8 1.8 0 0 0 0 3.6v1.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1.8a1.8 1.8 0 0 0 0-3.6z"/>' +
            '<path d="M12 7.6v8.8" stroke-width="2.4" stroke-dasharray="1.8 2.2"/></svg>',
@@ -825,6 +831,14 @@
     return m;
   }
 
+  function hasAllSet(cnt){
+    var ok = true;
+    CARDS.forEach(function(c){
+      if (!(cnt[c.id] > 0)) ok = false;
+    });
+    return ok;
+  }
+
   function hasFullSet(cnt){
     var ok = true;
     CARDS.forEach(function(c){
@@ -840,7 +854,8 @@
   function prizeStatus(u, p){
     var cnt = countCards(u.cards);
     var total = (u.cards || []).length;
-    if (redeemCount(u, p.id) >= p.per) return { ok:false, label:'已兌換' };
+    if (p.per > 0 && redeemCount(u, p.id) >= p.per) return { ok:false, label:'已兌換' };
+    if (p.need === 'all' && !hasAllSet(cnt)) return { ok:false, label:'未集齊' };
     if (p.need === 'full' && !hasFullSet(cnt)) return { ok:false, label:'未集齊' };
     if (p.need === 'hidden' && !(cnt.E > 0)) return { ok:false, label:'未有隱藏款' };
     if (total < p.cost) return { ok:false, label:'印花不足' };
@@ -891,15 +906,22 @@
     var html = '';
     PRIZES.forEach(function(p){
       var st = prizeStatus(u, p);
-      var needTxt = p.cost > 0 ? ('需 ' + p.cost + ' 張印花') : '免印花';
-      if (p.need === 'full') needTxt = '集齊 A–D 四款';
-      if (p.need === 'hidden') needTxt = '需持有隱藏款';
+      var needTxt = (p.cost > 0 ? ('需 ' + p.cost + ' 張印花') : '免印花') + ' · 不限量';
+      if (p.need === 'full') needTxt = '集齊 A–D 四款 · 不限量';
+      if (p.need === 'hidden') needTxt = '需持有隱藏款 · 不限量';
+
+      var noteTxt = p.note;
+      if (p.need === 'all'){
+        var kinds = 0;
+        CARDS.forEach(function(c){ if ((cnt[c.id] || 0) > 0) kinds++; });
+        noteTxt = '含隱藏款 · 已集 ' + kinds + ' / ' + CARDS.length + ' 款';
+      }
 
       html += '<div class="prize' + (st.ok ? '' : ' off') + '">' +
                 '<div class="pico">' + ICON[p.icon] + '</div>' +
                 '<div class="pbody">' +
                   '<div class="pname">' + p.name + '</div>' +
-                  '<div class="pmeta">' + needTxt + ' · ' + p.quota + '<br>' + p.note + '</div>' +
+                  '<div class="pmeta">' + needTxt + '<br>' + noteTxt + '</div>' +
                 '</div>' +
                 '<button class="pbtn' + (st.ok ? '' : ' off') + '" data-pid="' + p.id + '"' +
                   (st.ok ? '' : ' disabled') + '>' + st.label + '</button>' +
