@@ -1,33 +1,572 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>待测试</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#FAF5EB">
+<title>丸侠集卡 · 大埔振兴肉丸</title>
 <style>
-  html, body {
-    margin: 0;
-    height: 100%;
+  :root{
+    --red:#E32412;
+    --red-dk:#B81709;
+    --gold:#A87E40;
+    --ink:#221713;
+    --paper:#FAF5EB;
+    --white:#FBFFFF;
   }
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #ffffff;
-    color: #111111;
-    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
-    -webkit-text-size-adjust: 100%;
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;margin:0;}
+  body{
+    background:var(--paper);
+    background-image:radial-gradient(rgba(34,23,19,.055) 1px, transparent 1px);
+    background-size:14px 14px;
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+    overflow:hidden;
   }
-  .label {
-    font-size: clamp(36px, 16vw, 160px);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    line-height: 1.2;
-    user-select: none;
+  #stage{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+  .screen{display:none;min-height:100%;padding:calc(env(safe-area-inset-top) + 26px) 20px calc(env(safe-area-inset-bottom) + 24px);}
+  .screen.on{display:flex;flex-direction:column;}
+  .wrap{width:100%;max-width:430px;margin:auto;}
+
+  /* ---------- 品牌头 ---------- */
+  .brand{text-align:center;margin-bottom:22px;}
+  .brand-mascot{width:172px;max-width:52vw;display:block;margin:0 auto 6px;filter:drop-shadow(0 8px 10px rgba(34,23,19,.16));}
+  .brand h1{
+    margin:0;font-size:clamp(30px,9vw,38px);font-weight:900;letter-spacing:.2em;
+    text-indent:.2em;line-height:1.1;
   }
+  .brand .sub{
+    margin-top:9px;font-size:11.5px;font-weight:800;letter-spacing:.28em;color:var(--gold);
+    text-indent:.28em;
+  }
+
+  /* ---------- 表单面板 ---------- */
+  .panel{
+    background:var(--white);border:3px solid var(--ink);border-radius:22px;
+    box-shadow:0 7px 0 var(--ink);padding:20px 18px 18px;
+  }
+  .tabs{display:flex;gap:9px;margin-bottom:17px;}
+  .tab{
+    flex:1;padding:11px 0;border:3px solid var(--ink);border-radius:14px;background:#fff;
+    font:inherit;font-size:15px;font-weight:900;letter-spacing:.12em;color:#9a8d86;cursor:pointer;
+    transition:transform .12s,box-shadow .12s,background .12s,color .12s;
+  }
+  .tab.on{background:var(--red);color:#fff;box-shadow:0 4px 0 var(--ink);transform:translateY(-2px);}
+
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:11.5px;font-weight:900;letter-spacing:.14em;color:#7d706a;margin:0 0 6px 3px;}
+  .field input{
+    width:100%;padding:13px 14px;border:3px solid var(--ink);border-radius:14px;background:#fff;
+    font:inherit;font-size:16px;font-weight:800;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;
+  }
+  .field input::placeholder{color:#c0b4ae;font-weight:700;}
+  .field input:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(227,36,18,.11);}
+
+  .btn{
+    width:100%;padding:15px;margin-top:5px;border:3px solid var(--ink);border-radius:16px;
+    background:var(--red);color:#fff;font:inherit;font-size:17px;font-weight:900;letter-spacing:.2em;
+    text-indent:.2em;box-shadow:0 6px 0 var(--ink);cursor:pointer;
+    transition:transform .1s,box-shadow .1s,background .15s;
+  }
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink);}
+  .btn[disabled]{background:#c9bdb7;box-shadow:0 4px 0 var(--ink);cursor:default;}
+
+  .msg{
+    margin:12px 2px 0;font-size:13px;font-weight:800;line-height:1.5;border-radius:10px;
+    padding:9px 11px;display:none;
+  }
+  .msg.on{display:block;}
+  .msg.err{background:#FDE8E5;color:#B81709;border:2px solid #F3BDB6;}
+  .msg.ok{background:#E8F6EC;color:#1D7B3E;border:2px solid #B8E0C4;}
+
+  .fineprint{margin:18px 0 0;text-align:center;font-size:11px;line-height:1.7;color:#9a8d86;font-weight:700;letter-spacing:.03em;}
+
+  /* ---------- 主界面 ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .topbar .t{font-size:17px;font-weight:900;letter-spacing:.15em;}
+  .who{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;margin-top:3px;}
+  .ghost{
+    padding:9px 14px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;
+    font:inherit;font-size:12.5px;font-weight:900;letter-spacing:.1em;color:var(--ink);cursor:pointer;
+  }
+  .ghost:active{transform:translateY(2px);}
+
+  .sec-title{display:flex;align-items:baseline;justify-content:space-between;margin:0 3px 11px;}
+  .sec-title h2{margin:0;font-size:15px;font-weight:900;letter-spacing:.16em;}
+  .sec-title span{font-size:12px;font-weight:900;color:var(--red);letter-spacing:.05em;}
+
+  .album{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .slot{position:relative;aspect-ratio:900/1040;border-radius:15px;overflow:hidden;background:#fff;}
+  .slot.got{border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);}
+  .slot.got img{width:100%;height:100%;object-fit:cover;display:block;}
+  .slot.empty{
+    border:3px dashed rgba(34,23,19,.26);background:rgba(255,255,255,.45);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  }
+  .slot.empty b{font-size:38px;font-weight:900;color:rgba(34,23,19,.155);line-height:1;letter-spacing:.02em;}
+  .slot.empty i{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.16em;color:rgba(34,23,19,.28);}
+  .slot .num{
+    position:absolute;top:7px;right:7px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;
+    background:var(--red);border:2.5px solid var(--ink);color:#fff;font-size:12px;font-weight:900;
+    display:grid;place-items:center;
+  }
+  .cardname{margin:7px 2px 0;font-size:11.5px;font-weight:800;color:#7d706a;letter-spacing:.02em;text-align:center;}
+
+  .placeholder{
+    margin-top:22px;padding:20px 16px;border:3px dashed rgba(34,23,19,.24);border-radius:18px;
+    text-align:center;color:#a1938c;font-size:12.5px;font-weight:800;line-height:1.9;letter-spacing:.05em;
+  }
+
+  /* ---------- 发卡预览 ---------- */
+  .reveal{
+    position:fixed;inset:0;z-index:80;display:none;place-items:center;
+    background:rgba(18,12,10,.86);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+    padding:24px;
+  }
+  .reveal.on{display:grid;}
+  .reveal.out{animation:fadeOut .3s ease both;}
+  @keyframes fadeOut{to{opacity:0;}}
+
+  .reveal-inner{position:relative;width:min(80vw,330px);}
+
+  .reveal-card{
+    width:100%;display:block;border-radius:18px;border:3px solid var(--ink);
+    box-shadow:0 20px 46px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06) inset;
+    animation:cardIn .64s cubic-bezier(.18,1.42,.42,1) both;
+    will-change:transform,opacity;
+  }
+  @keyframes cardIn{
+    0%{transform:scale(.5) rotate(-10deg);opacity:0;}
+    55%{opacity:1;}
+    100%{transform:scale(1) rotate(0);opacity:1;}
+  }
+
+  .glow{
+    position:absolute;inset:-14%;border-radius:50%;pointer-events:none;z-index:-1;
+    background:radial-gradient(circle,rgba(255,206,120,.42) 0%,rgba(255,206,120,0) 62%);
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{transform:scale(.94);opacity:.75;}50%{transform:scale(1.06);opacity:1;}}
+
+  .reveal-close{
+    position:absolute;top:-15px;right:-15px;width:46px;height:46px;padding:0;z-index:5;
+    border:3px solid var(--ink);border-radius:50%;background:var(--red);color:#fff;
+    box-shadow:0 4px 0 var(--ink);cursor:pointer;display:grid;place-items:center;
+    transition:transform .1s,box-shadow .1s;
+    animation:closeIn .4s .5s both;
+  }
+  .reveal-close:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);}
+  .reveal-close svg{width:20px;height:20px;}
+  @keyframes closeIn{from{opacity:0;transform:scale(.4);}to{opacity:1;transform:scale(1);}}
+
+  .reveal-cap{margin-top:20px;text-align:center;animation:capIn .5s .42s both;}
+  @keyframes capIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .reveal-tag{
+    display:inline-block;padding:5px 13px;border-radius:20px;background:var(--red);color:#fff;
+    font-size:11px;font-weight:900;letter-spacing:.22em;text-indent:.22em;border:2.5px solid var(--ink);
+  }
+  .reveal-name{margin:11px 0 0;color:#FBFFFF;font-size:19px;font-weight:900;letter-spacing:.09em;}
+  .reveal-hint{margin:8px 0 0;color:rgba(251,255,254,.52);font-size:11.5px;font-weight:700;letter-spacing:.1em;}
+
+  /* ---------- 轻提示 ---------- */
+  .toast{
+    position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);z-index:90;
+    transform:translate(-50%,-160%);opacity:0;pointer-events:none;
+    transition:transform .34s cubic-bezier(.2,1.2,.4,1),opacity .2s;
+    background:var(--ink);color:var(--white);padding:11px 18px;border-radius:14px;
+    font-size:13px;font-weight:800;letter-spacing:.05em;max-width:calc(100% - 40px);text-align:center;
+    box-shadow:0 8px 20px rgba(34,23,19,.2);
+  }
+  .toast.on{transform:translate(-50%,0);opacity:1;}
 </style>
 </head>
 <body>
-  <div class="label">待测试</div>
+
+<div id="stage">
+
+  <!-- ========== 1. 登录 / 注册 ========== -->
+  <section class="screen on" id="scrAuth">
+    <div class="wrap">
+      <div class="brand">
+        <img class="brand-mascot" src="assets/mascot.webp" alt="丸侠">
+        <h1>丸侠集卡</h1>
+        <div class="sub">大埔振興肉丸 · 集換式印花</div>
+      </div>
+
+      <div class="panel">
+        <div class="tabs">
+          <button class="tab on" id="tabLogin" data-mode="login" type="button">登 入</button>
+          <button class="tab" id="tabReg" data-mode="reg" type="button">注 册</button>
+        </div>
+
+        <div class="field">
+          <label for="inUser">账号</label>
+          <input id="inUser" type="text" inputmode="text" autocomplete="username"
+                 placeholder="手机号或自定义昵称" maxlength="20">
+        </div>
+        <div class="field">
+          <label for="inPwd">密码</label>
+          <input id="inPwd" type="password" autocomplete="current-password"
+                 placeholder="至少 6 位" maxlength="32">
+        </div>
+        <div class="field" id="fieldPwd2" style="display:none">
+          <label for="inPwd2">确认密码</label>
+          <input id="inPwd2" type="password" autocomplete="new-password"
+                 placeholder="再输入一次" maxlength="32">
+        </div>
+
+        <button class="btn" id="btnSubmit" type="button">登入并领卡</button>
+        <div class="msg" id="msg"></div>
+      </div>
+
+      <p class="fineprint">
+        登录后系统将随机发放一张可交换印花卡<br>
+        演示版 · 账号与卡片仅保存在本机浏览器
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== 2. 主活动界面（占位） ========== -->
+  <section class="screen" id="scrMain">
+    <div class="wrap">
+      <div class="topbar">
+        <div>
+          <div class="t">丸侠集卡</div>
+          <div class="who" id="whoAmI">—</div>
+        </div>
+        <button class="ghost" id="btnLogout" type="button">退出</button>
+      </div>
+
+      <div class="sec-title">
+        <h2>我的卡册</h2>
+        <span id="progress">0 / 4</span>
+      </div>
+
+      <div class="album" id="album"></div>
+
+      <div class="placeholder" id="ruleNote">
+        主活动界面设计中<br>
+        兑换、交换、抽卡任务将在这里展开
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ========== 3. 发卡放大预览 ========== -->
+<div class="toast" id="toast"></div>
+<div class="reveal" id="reveal" aria-hidden="true">
+  <div class="reveal-inner">
+    <div class="glow"></div>
+    <img class="reveal-card" id="revealCard" src="" alt="">
+    <button class="reveal-close" id="btnCloseReveal" type="button" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round">
+        <path d="M5 5l14 14M19 5L5 19"/>
+      </svg>
+    </button>
+    <div class="reveal-cap">
+      <div class="reveal-tag" id="revealTag">获得卡片</div>
+      <p class="reveal-name" id="revealName">—</p>
+      <p class="reveal-hint">已收入卡册 · 可与好友交换</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ================= 卡池 ================= */
+  var CARDS = [
+    { id:'A', name:'鱼丸队长 · 叉腰', rank:'普通', img:'assets/card_a.webp', thumb:'assets/thumb_a.webp' },
+    { id:'B', name:'丸侠 · 蓄力',     rank:'普通', img:'assets/card_b.webp', thumb:'assets/thumb_b.webp' },
+    { id:'C', name:'鱼丸队长 · 腾空', rank:'稀有', img:'assets/card_c.webp', thumb:'assets/thumb_c.webp' },
+    { id:'D', name:'丸侠 · 展翅',     rank:'稀有', img:'assets/card_d.webp', thumb:'assets/thumb_d.webp' }
+  ];
+  function cardById(id){
+    for (var i=0;i<CARDS.length;i++) if (CARDS[i].id===id) return CARDS[i];
+    return null;
+  }
+
+  /* 发卡规则：'every-login' 每次登录发一张；'daily' 每天最多一张 */
+  var DRAW_RULE = 'every-login';
+  /* 抽卡权重：未拥有的卡 ×3，已拥有的 ×1（设为 1/1 即完全等概率） */
+  var W_NEW = 3, W_OWNED = 1;
+
+  /* ================= 本地存储 ================= */
+  var K_USERS = 'wanxia.users.v1';
+  var K_CUR   = 'wanxia.current.v1';
+
+  function readUsers(){
+    try { return JSON.parse(localStorage.getItem(K_USERS) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function writeUsers(u){
+    try { localStorage.setItem(K_USERS, JSON.stringify(u)); } catch(e){}
+  }
+  function getCur(){ try { return localStorage.getItem(K_CUR) || ''; } catch(e){ return ''; } }
+  function setCur(n){
+    try { n ? localStorage.setItem(K_CUR, n) : localStorage.removeItem(K_CUR); } catch(e){}
+  }
+
+  async function hashPwd(pwd){
+    var raw = 'wanxia.v1|' + pwd;
+    try{
+      if (window.crypto && crypto.subtle){
+        var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+        return Array.prototype.map.call(new Uint8Array(buf), function(b){
+          return ('0'+b.toString(16)).slice(-2);
+        }).join('');
+      }
+    }catch(e){}
+    var h = 5381;
+    for (var i=0;i<raw.length;i++) h = ((h<<5) + h + raw.charCodeAt(i)) >>> 0;
+    return 'f' + h.toString(16);
+  }
+
+  /* ================= DOM ================= */
+  var $ = function(id){ return document.getElementById(id); };
+  var scrAuth=$('scrAuth'), scrMain=$('scrMain');
+  var inUser=$('inUser'), inPwd=$('inPwd'), inPwd2=$('inPwd2');
+  var fieldPwd2=$('fieldPwd2'), btnSubmit=$('btnSubmit'), msgEl=$('msg');
+  var tabLogin=$('tabLogin'), tabReg=$('tabReg');
+  var album=$('album'), whoAmI=$('whoAmI'), progressEl=$('progress');
+  var reveal=$('reveal'), revealCard=$('revealCard'), revealName=$('revealName'), revealTag=$('revealTag');
+  var btnCloseReveal=$('btnCloseReveal'), btnLogout=$('btnLogout');
+  var toastEl=$('toast'), toastTimer=null;
+
+  var mode = 'login';
+  var currentUser = '';
+
+  /* ================= 提示 ================= */
+  function say(text, kind){
+    msgEl.textContent = text;
+    msgEl.className = 'msg on ' + (kind || 'err');
+  }
+  function clearMsg(){ msgEl.className = 'msg'; msgEl.textContent = ''; }
+
+  function toast(text){
+    toastEl.textContent = text;
+    toastEl.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('on'); }, 2600);
+  }
+
+  /* ================= 模式切换 ================= */
+  function setMode(m){
+    mode = m;
+    var isReg = (m === 'reg');
+    tabLogin.classList.toggle('on', !isReg);
+    tabReg.classList.toggle('on', isReg);
+    fieldPwd2.style.display = isReg ? 'block' : 'none';
+    btnSubmit.textContent = isReg ? '注册并领卡' : '登入并领卡';
+    inPwd.setAttribute('autocomplete', isReg ? 'new-password' : 'current-password');
+    clearMsg();
+  }
+  tabLogin.addEventListener('click', function(){ setMode('login'); });
+  tabReg.addEventListener('click', function(){ setMode('reg'); });
+
+  /* ================= 屏幕切换 ================= */
+  function showScreen(el){
+    [scrAuth, scrMain].forEach(function(s){ s.classList.toggle('on', s === el); });
+    $('stage').scrollTop = 0;
+  }
+
+  /* ================= 主界面渲染 ================= */
+  function renderMain(){
+    var users = readUsers();
+    var u = users[currentUser];
+    if (!u) return;
+
+    whoAmI.textContent = currentUser + ' · 已登录';
+
+    var count = {};
+    (u.cards || []).forEach(function(id){ count[id] = (count[id] || 0) + 1; });
+
+    var got = 0, html = '';
+    CARDS.forEach(function(c){
+      var n = count[c.id] || 0;
+      if (n > 0) {
+        got++;
+        html += '<div class="slot got">' +
+                  '<img src="' + c.thumb + '" alt="' + c.name + '">' +
+                  (n > 1 ? '<div class="num">×' + n + '</div>' : '') +
+                '</div>';
+      } else {
+        html += '<div class="slot empty"><b>' + c.id + '</b><i>未获得</i></div>';
+      }
+    });
+    album.innerHTML = html;
+    progressEl.textContent = got + ' / ' + CARDS.length;
+
+    var rule = (DRAW_RULE === 'daily') ? '每天登录可抽取一张印花卡' : '每次登录可抽取一张印花卡';
+    $('ruleNote').innerHTML = rule + '<br>主活动界面设计中<br>兑换 · 交换 · 抽卡任务将在这里开启';
+  }
+
+  /* ================= 抽卡 ================= */
+  function drawCard(owned){
+    var pool = [];
+    CARDS.forEach(function(c){
+      var w = (owned && owned[c.id]) ? W_OWNED : W_NEW;
+      for (var i=0;i<w;i++) pool.push(c);
+    });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function canDraw(u){
+    if (DRAW_RULE === 'daily'){
+      var last = u.lastDraw || 0;
+      if (!last) return true;
+      return new Date(last).toDateString() !== new Date().toDateString();
+    }
+    return true;
+  }
+
+  /* ================= 发卡预览 ================= */
+  var revealTimer = null;
+  function showReveal(card){
+    revealCard.src = card.img;
+    revealCard.alt = card.name;
+    revealName.textContent = card.name;
+    revealTag.textContent = card.rank === '稀有' ? '稀有卡片' : '获得卡片';
+
+    reveal.classList.remove('out');
+    reveal.classList.add('on');
+    reveal.setAttribute('aria-hidden', 'false');
+
+    revealCard.style.animation = 'none';
+    void revealCard.offsetWidth;
+    revealCard.style.animation = '';
+  }
+
+  function hideReveal(){
+    if (!reveal.classList.contains('on')) return;
+    reveal.classList.add('out');
+    reveal.setAttribute('aria-hidden', 'true');
+    clearTimeout(revealTimer);
+    revealTimer = setTimeout(function(){
+      reveal.classList.remove('on', 'out');
+    }, 300);
+  }
+
+  btnCloseReveal.addEventListener('click', hideReveal);
+
+  /* ================= 进入主界面（并发放卡片） ================= */
+  function enterMain(withDraw){
+    showScreen(scrMain);
+    renderMain();
+    if (!withDraw) return;
+
+    var users = readUsers();
+    var u = users[currentUser];
+    if (!u) return;
+
+    if (!canDraw(u)){
+      toast('今天已经领过卡片了，明天再来');
+      return;
+    }
+
+    var owned = {};
+    (u.cards || []).forEach(function(id){ owned[id] = 1; });
+
+    var card = drawCard(owned);
+    u.cards.push(card.id);
+    u.lastDraw = Date.now();
+    writeUsers(users);
+    renderMain();
+    setTimeout(function(){ showReveal(card); }, 300);
+  }
+
+  /* ================= 登录 / 注册 ================= */
+  var busy = false;
+  async function submit(){
+    if (busy) return;
+
+    var user = inUser.value.trim();
+    var pwd  = inPwd.value;
+
+    if (user.length < 2){ return say('账号至少 2 个字符'); }
+    if (/\s/.test(user)){ return say('账号不能包含空格'); }
+    if (pwd.length < 6){ return say('密码至少 6 位'); }
+
+    var users = readUsers();
+
+    if (mode === 'reg'){
+      if (inPwd2.value !== pwd){ return say('两次输入的密码不一致'); }
+      if (users[user]){ return say('该账号已注册，请直接登入'); }
+    } else {
+      if (!users[user]){ return say('账号不存在，请先注册'); }
+    }
+
+    busy = true;
+    btnSubmit.disabled = true;
+
+    try{
+      var h = await hashPwd(pwd);
+
+      if (mode === 'reg'){
+        users = readUsers();
+        if (users[user]){                 // 异步期间被别人占用（同一浏览器多标签）
+          say('该账号已注册，请直接登入');
+          return;
+        }
+        users[user] = { pwd: h, cards: [], at: Date.now() };
+        writeUsers(users);
+        say('注册成功，正在为你发卡…', 'ok');
+      } else {
+        if (users[user].pwd !== h){ return say('密码不正确'); }
+        say('登入成功，正在为你发卡…', 'ok');
+      }
+
+      currentUser = user;
+      setCur(user);
+      inPwd.value = ''; inPwd2.value = '';
+      clearMsg();
+
+      setTimeout(function(){ enterMain(true); }, 220);
+
+    } catch(err){
+      say('操作失败，请重试');
+    } finally {
+      setTimeout(function(){
+        busy = false;
+        btnSubmit.disabled = false;
+      }, 400);
+    }
+  }
+
+  btnSubmit.addEventListener('click', submit);
+  [inUser, inPwd, inPwd2].forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') submit();
+    });
+  });
+
+  /* ================= 退出 ================= */
+  btnLogout.addEventListener('click', function(){
+    setCur('');
+    currentUser = '';
+    inUser.value = ''; inPwd.value = ''; inPwd2.value = '';
+    setMode('login');
+    showScreen(scrAuth);
+  });
+
+  /* ================= 启动 ================= */
+  (function boot(){
+    var cur = getCur();
+    var users = readUsers();
+    if (cur && users[cur]){
+      currentUser = cur;
+      enterMain(false);          // 已登录：恢复会话，不重复发卡
+    } else {
+      setCur('');
+      showScreen(scrAuth);
+    }
+  })();
+
+})();
+</script>
 </body>
 </html>
