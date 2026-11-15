@@ -683,7 +683,15 @@
 
   /* 發卡規則：'every-login' 每次登入發一張；'daily' 每天最多一張 */
   var DRAW_RULE = 'every-login';
-  /* 抽卡權重：未擁有的卡 ×3，已擁有的 ×1（設為 1/1 即完全等概率） */
+
+  /* ★ 稀有度權重（每張卡的基準份額）。三檔比例約 6 : 3 : 1 ——
+     普通每張 30 份、稀有每張 14 份、隱藏每張 8 份。
+     改這裡就能調檔位差距，例如想要更難抽：{ '普通': 40, '稀有': 10, '隱藏': 3 }。 */
+  var RARITY_W = { '普通': 30, '稀有': 14, '隱藏': 8 };
+
+  /* 擁有狀態係數：未擁有的卡 ×3、已擁有的 ×1
+     ⇒ 集齊的路上新卡優先，集齊後重複卡才會變多（重複卡剛好用來兌券）。
+     若想做到「只看稀有度、不管有沒有」，把這裡設成 1 / 1。 */
   var W_NEW = 3, W_OWNED = 1;
 
   /* 驗證碼有效期（毫秒）與重發間隔（秒） */
@@ -865,7 +873,8 @@
     var pool = [];
     CARDS.forEach(function(c){
       if (!drawable(c)) return;                 // 隱藏款卡面未就緒，暫不入池
-      var w = (owned && owned[c.id]) ? W_OWNED : W_NEW;
+      var base = RARITY_W[c.rank] || 10;        // 稀有度份額
+      var w = base * ((owned && owned[c.id]) ? W_OWNED : W_NEW);
       for (var i=0;i<w;i++) pool.push(c);
     });
     return pool[Math.floor(Math.random() * pool.length)];
