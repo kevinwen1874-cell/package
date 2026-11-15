@@ -164,7 +164,9 @@
 
   .album{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .slot{position:relative;aspect-ratio:900/1040;border-radius:15px;overflow:hidden;background:#fff;}
-  .slot.got{border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);}
+  .slot.got{border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);cursor:pointer;
+    transition:transform .1s,box-shadow .1s;}
+  .slot.got:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink);}
   .slot.got img{width:100%;height:100%;object-fit:cover;display:block;}
   .slot.empty{
     border:3px dashed rgba(34,23,19,.26);background:rgba(255,255,255,.45);
@@ -589,7 +591,7 @@
     <div class="reveal-cap">
       <div class="reveal-tag" id="revealTag">獲得卡片</div>
       <p class="reveal-name" id="revealName">—</p>
-      <p class="reveal-hint">已收入卡冊 · 可與好友交換</p>
+      <p class="reveal-hint" id="revealHint">已收入卡冊 · 可與好友交換</p>
     </div>
   </div>
 </div>
@@ -735,7 +737,7 @@
   var btnSendCode=$('btnSendCode'), codeHint=$('codeHint');
   var btnSubmit=$('btnSubmit'), msgEl=$('msg');
   var album=$('album'), whoAmI=$('whoAmI'), progressEl=$('progress');
-  var reveal=$('reveal'), revealCard=$('revealCard'), revealName=$('revealName'), revealTag=$('revealTag');
+  var reveal=$('reveal'), revealCard=$('revealCard'), revealName=$('revealName'), revealTag=$('revealTag'), revealHint=$('revealHint');
   var btnCloseReveal=$('btnCloseReveal'), btnLogout=$('btnLogout');
   var prizeList=$('prizeList'), wmTotal=$('wmTotal'), wmSub=$('wmSub');
   var sheetConfirm=$('sheetConfirm'), sheetDone=$('sheetDone'), sheetRecords=$('sheetRecords');
@@ -856,7 +858,7 @@
       if (c.id === 'E'){
         if (n > 0 && drawable(c)){
           got++;
-          html += '<div class="slot got wide">' +
+          html += '<div class="slot got wide" data-id="' + c.id + '">' +
                     '<img src="' + c.thumb + '" alt="' + c.name + '">' +
                     (n > 1 ? '<div class="num">×' + n + '</div>' : '') +
                   '</div>';
@@ -870,7 +872,7 @@
       }
       if (n > 0) {
         got++;
-        html += '<div class="slot got">' +
+        html += '<div class="slot got" data-id="' + c.id + '">' +
                   '<img src="' + c.thumb + '" alt="' + c.name + '">' +
                   (n > 1 ? '<div class="num">×' + n + '</div>' : '') +
                 '</div>';
@@ -905,11 +907,17 @@
 
   /* ================= 發卡預覽 ================= */
   var revealTimer = null;
-  function showReveal(card){
+  function showReveal(card, fromAlbum){
     revealCard.src = card.img;
     revealCard.alt = card.name;
     revealName.textContent = card.name;
-    revealTag.textContent = card.rank === '稀有' ? '稀有卡片' : '獲得卡片';
+    if (fromAlbum){
+      revealTag.textContent = card.rank === '稀有' ? '稀有卡片' : '普通卡片';
+      revealHint.textContent = '點擊空白處關閉 · 可與好友交換';
+    } else {
+      revealTag.textContent = card.rank === '稀有' ? '稀有卡片' : '獲得卡片';
+      revealHint.textContent = '已收入卡冊 · 可與好友交換';
+    }
 
     reveal.classList.remove('out');
     reveal.classList.add('on');
@@ -931,6 +939,22 @@
   }
 
   btnCloseReveal.addEventListener('click', hideReveal);
+
+  // 點卡冊裡的卡面 → 用抽到時的同一個放大畫面顯示
+  album.addEventListener('click', function(e){
+    var slot = e.target.closest ? e.target.closest('.slot.got') : null;
+    if (!slot || !album.contains(slot)) return;
+    var id = slot.getAttribute('data-id'), card = null;
+    for (var i = 0; i < CARDS.length; i++){
+      if (CARDS[i].id === id){ card = CARDS[i]; break; }
+    }
+    if (card) showReveal(card, true);
+  });
+
+  // 點放大層的空白處也能關掉（點卡面本身不關）
+  reveal.addEventListener('click', function(e){
+    if (e.target === reveal) hideReveal();
+  });
 
   /* ================= 進入主界面（並發放卡片） ================= */
   function enterMain(withDraw){
