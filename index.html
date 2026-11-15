@@ -1574,6 +1574,13 @@
   });
 
   /* ================= 啟動 ================= */
+  /* C 卡是 12 幀動態 WebP（約 211KB）。在登入頁停留期間先預載，
+     避免抽到 C 卡、放大預覽彈出的瞬間出現白場。延遲 800ms 不搶首屏。 */
+  setTimeout(function(){
+    var im = new Image();
+    im.src = 'assets/card_c.webp';
+  }, 800);
+
   (function boot(){
     var cur = getCur();
     var users = readUsers();
