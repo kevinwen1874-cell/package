@@ -670,7 +670,7 @@
   var CARDS = [
     { id:'A', name:'魚丸隊長 · 叉腰', rank:'普通', img:'assets/card_a.webp', thumb:'assets/thumb_a.webp' },
     { id:'B', name:'丸俠 · 蓄力',     rank:'普通', img:'assets/card_b.webp', thumb:'assets/thumb_b.webp' },
-    { id:'C', name:'魚丸隊長 · 騰空', rank:'稀有', img:'assets/card_c.webp', thumb:'assets/thumb_c.webp' },
+    { id:'C', name:'魚丸隊長 · 騰空', rank:'稀有', img:'assets/card_c.webp?v=20261115d', thumb:'assets/thumb_c.webp?v=20261115d' },
     { id:'D', name:'丸俠 · 展翅',     rank:'稀有', img:'assets/card_d.webp', thumb:'assets/thumb_d.webp' },
     /* ★ 隱藏款：雙角色同框。卡面圖未出，ready:false ⇒ 卡冊照樣顯示第 5 格（鎖定態）、但不進入抽卡池。
        出圖後把 card_e.webp / thumb_e.webp 放進 assets，並把 ready 改成 true 即可啟用。 */
@@ -1574,11 +1574,13 @@
   });
 
   /* ================= 啟動 ================= */
-  /* C 卡是 12 幀動態 WebP（約 211KB）。在登入頁停留期間先預載，
-     避免抽到 C 卡、放大預覽彈出的瞬間出現白場。延遲 800ms 不搶首屏。 */
+  /* C、D 卡都是 12 幀動態 WebP（C 約 211KB、D 約 82KB）。在登入頁停留期間先預載，
+     避免抽到動態卡、放大預覽彈出的瞬間出現白場。延遲 800ms 不搶首屏。 */
   setTimeout(function(){
-    var im = new Image();
-    im.src = 'assets/card_c.webp';
+    ['assets/card_c.webp?v=20261115d', 'assets/card_d.webp'].forEach(function(src){
+      var im = new Image();
+      im.src = src;
+    });
   }, 800);
 
   (function boot(){
