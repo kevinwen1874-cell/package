@@ -685,7 +685,7 @@
 
   /* ================= 卡池（共 5 張：普通 ×2、稀有 ×2、隱藏 ×1） ================= */
   var CARDS = [
-    { id:'A', name:'魚丸隊長 · 叉腰', rank:'普通', img:'assets/card_a.webp?v=20261116d', thumb:'assets/thumb_a.webp?v=20261116d' },
+    { id:'A', name:'萬能卡', rank:'萬能', img:'assets/card_a.webp?v=20261117b', thumb:'assets/thumb_a.webp?v=20261117b' },
     { id:'B', name:'丸俠 · yummy！',  rank:'普通', img:'assets/card_b.webp?v=20261116d', thumb:'assets/thumb_b.webp?v=20261116d' },
     { id:'C', name:'魚丸隊長 · 騰空', rank:'稀有', img:'assets/card_c.webp?v=20261116d', thumb:'assets/thumb_c.webp?v=20261116d' },
     { id:'D', name:'丸俠 · 展翅',     rank:'稀有', img:'assets/card_d.webp?v=20261116d', thumb:'assets/thumb_d.webp?v=20261116d' },
@@ -704,7 +704,7 @@
   /* ★ 稀有度權重（每張卡的基準份額）。三檔比例約 6 : 3 : 1 ——
      普通每張 30 份、稀有每張 14 份、隱藏每張 8 份。
      改這裡就能調檔位差距，例如想要更難抽：{ '普通': 40, '稀有': 10, '隱藏': 3 }。 */
-  var RARITY_W = { '普通': 30, '稀有': 14, '隱藏': 8 };
+  var RARITY_W = { '普通': 30, '稀有': 14, '隱藏': 8, '萬能': 30 };   // 萬能卡份額沿用普通卡 30，避免改变现有抽取分布
 
   /* 擁有狀態係數：1 / 1 = 不區分是否已擁有，純按稀有度抽（真實抽卡感，同一張會反覆抽到）。
      若日後想讓「還缺的那張」更容易補上，設成 3 / 1 即可恢復缺卡優先，其餘不用改。 */
@@ -911,11 +911,12 @@
     revealCard.src = card.img;
     revealCard.alt = card.name;
     revealName.textContent = card.name;
+    var RANK_TAG = { '普通':'普通卡片', '稀有':'稀有卡片', '隱藏':'隱藏款', '萬能':'萬能卡片' };
     if (fromAlbum){
-      revealTag.textContent = card.rank === '稀有' ? '稀有卡片' : '普通卡片';
+      revealTag.textContent = RANK_TAG[card.rank] || '普通卡片';
       revealHint.textContent = '點擊空白處關閉 · 可與好友交換';
     } else {
-      revealTag.textContent = card.rank === '稀有' ? '稀有卡片' : '獲得卡片';
+      revealTag.textContent = card.rank === '普通' ? '獲得卡片' : (RANK_TAG[card.rank] || '獲得卡片');
       revealHint.textContent = '已收入卡冊 · 可與好友交換';
     }
 
