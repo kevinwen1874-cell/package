@@ -26,7 +26,7 @@
   }
   #stage{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
-  .screen{display:none;min-height:100%;padding:calc(env(safe-area-inset-top) + 26px) 20px calc(env(safe-area-inset-bottom) + 24px);}
+  .screen{display:none;min-height:100%;padding:calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 16px);}
   .screen.on{display:flex;flex-direction:column;}
   .wrap{width:100%;max-width:430px;margin:auto;}
 
@@ -106,19 +106,6 @@
   .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink);}
   .btn[disabled]{background:#c9bdb7;box-shadow:0 4px 0 var(--ink);cursor:default;}
 
-  /* ===== 測試用抽卡按鈕（僅網址帶 test 參數時出現，正式連結看不到） ===== */
-  #testDraw{
-    position:fixed;right:12px;bottom:12px;z-index:95;display:none;
-    padding:9px 12px;border:3px solid var(--ink);border-radius:14px;
-    background:#2B2622;color:#FFE9A8;
-    font:inherit;font-size:13px;font-weight:900;letter-spacing:.06em;line-height:1.25;
-    box-shadow:0 5px 0 var(--ink);cursor:pointer;
-    -webkit-tap-highlight-color:transparent;user-select:none;
-  }
-  #testDraw.on{display:block;}
-  #testDraw:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink);}
-  #testDraw .sub{display:block;margin-top:3px;font-size:10px;font-weight:700;letter-spacing:0;color:#C9BDAF;}
-
   .msg{
     margin:12px 2px 0;font-size:13px;font-weight:800;line-height:1.5;border-radius:10px;
     padding:9px 11px;display:none;
@@ -130,7 +117,7 @@
   .fineprint{margin:18px 0 0;text-align:center;font-size:11px;line-height:1.7;color:#9a8d86;font-weight:700;letter-spacing:.03em;}
 
   /* ---------- 主界面 ---------- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:20px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:13px;}
   .topbar .t{font-size:17px;font-weight:900;letter-spacing:.15em;}
   .who{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;margin-top:3px;white-space:nowrap;}
   /* 窄屏（≤389px）讓「· 已登入」讓位，避免手機號掩碼被折成兩行 */
@@ -158,11 +145,34 @@
   }
   .ghost:active{transform:translateY(2px);}
 
+  /* 卡冊進度：原本在「我的卡冊」標題行右側，標題行刪掉後併入頂欄標題 */
+  .prog-badge{
+    font-size:11px;font-weight:900;color:var(--red);letter-spacing:.04em;
+    margin-left:5px;vertical-align:2px;font-variant-numeric:tabular-nums;
+    white-space:nowrap;display:inline-block;
+  }
+  .topbar .t{white-space:nowrap;}
+
+  /* 子頁標題列（兌換 / 交換）裡的網店入口：與頂欄同一模塊的緊湊版 */
+  .shoplink.mini{padding:4px 5px 4px 7px;border-width:2px;border-radius:10px;box-shadow:0 2px 0 var(--ink);gap:4px;}
+  .shoplink.mini .sl-txt{font-size:8px;line-height:1.35;}
+  .shoplink.mini .sl-arrow{font-size:9px;}
+  .shoplink.mini .sl-ico{flex:0 0 21px;width:21px;height:21px;border-width:1.6px;border-radius:7px;}
+  .shoplink.mini .sl-ico svg{width:12px;height:12px;}
+  .shoplink.mini:active{box-shadow:0 0 0 var(--ink);}
+  /* 窄屏（≤379px）：標題列塞不下「標題＋網店框＋記錄鈕」，網店框自動落到第二行靠右 */
+  @media (max-width:379px){
+    .subbar{flex-wrap:wrap;row-gap:8px;}
+    .subbar .shoplink.mini{order:9;flex:1 1 100%;justify-content:flex-end;}
+    .subbar .shoplink.mini .sl-txt{font-size:9px;}
+    .subbar .shoplink.mini .sl-ico{flex:0 0 23px;width:23px;height:23px;}
+  }
+
   .sec-title{display:flex;align-items:baseline;justify-content:space-between;margin:0 3px 11px;}
   .sec-title h2{margin:0;font-size:15px;font-weight:900;letter-spacing:.16em;}
   .sec-title span{font-size:12px;font-weight:900;color:var(--red);letter-spacing:.05em;}
 
-  .album{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .album{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .slot{position:relative;aspect-ratio:900/1040;border-radius:15px;overflow:hidden;background:#fff;}
   .slot.got{border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);cursor:pointer;
     transition:transform .1s,box-shadow .1s;}
@@ -177,14 +187,14 @@
 
   /* 隱藏款卡位：獨佔一行，深底斜紋 + 描金標籤 */
   .slot.locked{
-    grid-column:1 / -1;aspect-ratio:16/9;border:3px solid var(--ink);border-radius:15px;
+    grid-column:1 / -1;aspect-ratio:900/250;border:3px solid var(--ink);border-radius:15px;
     box-shadow:0 5px 0 var(--ink);overflow:hidden;position:relative;
     background:repeating-linear-gradient(45deg,#2A1E19 0 9px,#332520 9px 18px);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    display:flex;flex-direction:row;align-items:center;justify-content:center;gap:11px;
   }
-  .slot.locked b{font-size:58px;font-weight:900;line-height:1;color:rgba(255,206,120,.34);letter-spacing:.04em;}
+  .slot.locked b{font-size:38px;font-weight:900;line-height:1;color:rgba(255,206,120,.34);letter-spacing:.04em;}
   .lk-tag{
-    position:absolute;top:9px;left:9px;padding:3px 10px;border-radius:10px;background:var(--gold);
+    position:static;padding:3px 10px;border-radius:10px;background:var(--gold);
     color:#fff;font-size:10px;font-weight:900;letter-spacing:.16em;text-indent:.16em;border:2px solid var(--ink);
   }
   /* 隱藏款橫卡：16:9（生視頻模型的通用橫屏檔），視頻/圖都鋪滿整個格 */
@@ -212,7 +222,7 @@
   .cardname{margin:7px 2px 0;font-size:11.5px;font-weight:800;color:#7d706a;letter-spacing:.02em;text-align:center;}
 
   /* 主界面動作按鈕：兌換 / 交換 */
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px;}
   .act{
     padding:19px 6px;border:3px solid var(--ink);border-radius:18px;
     font:inherit;font-size:16px;font-weight:900;letter-spacing:.02em;
@@ -277,8 +287,9 @@
 
   /* ---------- 兌換獎品頁 ---------- */
   #scrRedeem .wrap{margin:0 auto;}
-  .subbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
-  .subbar .t{flex:1;font-size:17px;font-weight:900;letter-spacing:.15em;}
+  .subbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .subbar .t{flex:1;min-width:0;font-size:15px;font-weight:900;letter-spacing:.04em;white-space:nowrap;}
+  .subbar .ghost{padding:9px 11px;font-size:12px;letter-spacing:.06em;white-space:nowrap;}
   .backbtn{
     flex:0 0 auto;width:40px;height:40px;padding:0;border:3px solid var(--ink);border-radius:12px;
     background:var(--white);box-shadow:0 4px 0 var(--ink);display:grid;place-items:center;cursor:pointer;
@@ -489,7 +500,7 @@
     <div class="wrap">
       <div class="topbar">
         <div>
-          <div class="t">丸俠集卡</div>
+          <div class="t">丸俠集卡 <b class="prog-badge" id="progress">0 / 5</b></div>
           <div class="who" id="whoAmI">—</div>
         </div>
         <div class="topbar-r">
@@ -506,11 +517,6 @@
           </a>
           <button class="ghost" id="btnLogout" type="button">登出</button>
         </div>
-      </div>
-
-      <div class="sec-title">
-        <h2>我的卡冊</h2>
-        <span id="progress">0 / 4</span>
       </div>
 
       <div class="album" id="album"></div>
@@ -531,6 +537,7 @@
                stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
         </button>
         <div class="t">兌換獎品</div>
+        <a class="shoplink mini" href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer"><span class="sl-txt">想了解更多振興產品？<br>歡迎來我們網店選購！</span><span class="sl-arrow">➡</span><span class="sl-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"><path d="M5.6 8.2h12.8l-1.1 11.6H6.7z"/><path d="M9.2 8.2V6.5a2.8 2.8 0 0 1 5.6 0v1.7"/></svg></span></a>
         <button class="ghost" id="btnRecords" type="button">兌換記錄</button>
       </div>
 
@@ -557,6 +564,7 @@
                stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
         </button>
         <div class="t">交換卡片</div>
+        <a class="shoplink mini" href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer"><span class="sl-txt">想了解更多振興產品？<br>歡迎來我們網店選購！</span><span class="sl-arrow">➡</span><span class="sl-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"><path d="M5.6 8.2h12.8l-1.1 11.6H6.7z"/><path d="M9.2 8.2V6.5a2.8 2.8 0 0 1 5.6 0v1.7"/></svg></span></a>
         <button class="ghost" id="btnSwapLog" type="button">交換記錄</button>
       </div>
 
@@ -697,8 +705,6 @@
   </div>
 </div>
 
-<button id="testDraw" type="button">測試抽卡<span class="sub">點一下抽 1 張 · Shift 連抽 10</span></button>
-
 <script>
 (function(){
   'use strict';
@@ -710,7 +716,7 @@
     { id:'C', name:'魚丸隊長 · 飛行！', rank:'稀有', img:'assets/card_c.webp?v=20261117d', thumb:'assets/thumb_c.webp?v=20261117d' },
     { id:'D', name:'丸俠 · 好串！',   rank:'稀有', img:'assets/card_d.webp?v=20261117d', thumb:'assets/thumb_d.webp?v=20261117d' },
     /* ★ 隱藏款：雙角色同框。卡面圖未出，ready:false ⇒ 卡冊照樣顯示第 5 格（鎖定態）、但不進入抽卡池。
-       出圖後把 card_e.webp / thumb_e.webp 放進 assets，並把 ready 改成 true 即可啟用。 */
+       出圖後把 card_e.webp / thumb_e.webp / card_e.mp4 放進 assets，並把 ready 改成 true 即可啟用。 */
     { id:'E', name:'雙雄同框', rank:'隱藏', ready:false, wide:true, vid:'assets/card_e.mp4',
       img:'assets/card_e.webp', thumb:'assets/thumb_e.webp' }
   ];
@@ -722,10 +728,14 @@
   /* 發卡規則：'every-login' 每次登入發一張；'daily' 每天最多一張 */
   var DRAW_RULE = 'every-login';
 
-  /* ★ 稀有度權重（每張卡的基準份額）。三檔比例約 6 : 3 : 1 ——
-     普通每張 30 份、稀有每張 14 份、隱藏每張 8 份。
-     改這裡就能調檔位差距，例如想要更難抽：{ '普通': 40, '稀有': 10, '隱藏': 3 }。 */
-  var RARITY_W = { '普通': 30, '稀有': 14, '隱藏': 8, '萬能': 30 };   // 萬能卡份額沿用普通卡 30，避免改变现有抽取分布
+  /* ★ 稀有度權重（每張卡的基準份額）。總份額 40，實際概率：
+       普通 22/40 = 55%     （B 一張）
+       稀有  8/40 = 20% 每張（C、D 兩張 ⇒ 檔位合計 40%）
+       萬能  1/40 = 2.5%    （A 一張）
+       隱藏  1/40 = 2.5%    （E 一張）
+     ★ 注意：這裡是「每張卡」的份額，同一稀有度有幾張卡就會佔幾倍（稀有兩張 ⇒ 8×2=16 份）。
+     改這裡就能調檔位差距，例如想讓隱藏更難：{ '普通': 22, '稀有': 8, '萬能': 1, '隱藏': 0.5 }。 */
+  var RARITY_W = { '普通': 22, '稀有': 8, '萬能': 1, '隱藏': 1 };
 
   /* 擁有狀態係數：1 / 1 = 不區分是否已擁有，純按稀有度抽（真實抽卡感，同一張會反覆抽到）。
      若日後想讓「還缺的那張」更容易補上，設成 3 / 1 即可恢復缺卡優先，其餘不用改。 */
@@ -1673,53 +1683,6 @@
       im.src = src;
     });
   }, 800);
-
-  /* ================= 測試工具：無限抽卡 =================
-     ★ 只在網址帶 test 時啟用（?test=1 或 #test），正式連結看不到這顆按鈕。
-     走的是同一套 drawCard() 權重，只是跳過 canDraw() 的發卡限制。 */
-  (function testDrawTool(){
-    var q = location.search + location.hash;
-    if (q.indexOf('test') < 0) return;
-
-    var btn = document.getElementById('testDraw');
-    if (!btn) return;
-    btn.classList.add('on');
-
-    var n = 0, last = null;
-
-    function once(){
-      var users = readUsers();
-      var u = users[currentUser];
-      if (!u) return null;
-      if (!u.cards) u.cards = [];
-      var owned = {};
-      u.cards.forEach(function(id){ owned[id] = 1; });
-      var card = drawCard(owned);
-      u.cards.push(card.id);
-      u.lastDraw = Date.now();
-      writeUsers(users);
-      return card;
-    }
-
-    function run(times){
-      if (!currentUser || !readUsers()[currentUser]){ toast('請先登入再測試'); return; }
-      for (var i = 0; i < times; i++){
-        var c = once();
-        if (!c) break;
-        last = c;
-        n++;
-      }
-      renderMain();
-      if (last) showReveal(last);
-      btn.innerHTML = '測試抽卡<span class="sub">已抽 ' + n + ' 張 · Shift 連抽 10</span>';
-    }
-
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      run(e.shiftKey ? 10 : 1);
-    });
-    btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-  })();
 
   (function boot(){
     var cur = getCur();
