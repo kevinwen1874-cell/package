@@ -177,7 +177,7 @@
 
   /* 隱藏款卡位：獨佔一行，深底斜紋 + 描金標籤 */
   .slot.locked{
-    grid-column:1 / -1;aspect-ratio:900/380;border:3px solid var(--ink);border-radius:15px;
+    grid-column:1 / -1;aspect-ratio:16/9;border:3px solid var(--ink);border-radius:15px;
     box-shadow:0 5px 0 var(--ink);overflow:hidden;position:relative;
     background:repeating-linear-gradient(45deg,#2A1E19 0 9px,#332520 9px 18px);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
@@ -187,8 +187,23 @@
     position:absolute;top:9px;left:9px;padding:3px 10px;border-radius:10px;background:var(--gold);
     color:#fff;font-size:10px;font-weight:900;letter-spacing:.16em;text-indent:.16em;border:2px solid var(--ink);
   }
-  .slot.got.wide{grid-column:1 / -1;aspect-ratio:900/380;}
-  .slot.got.wide img{object-fit:cover;}
+  /* 隱藏款橫卡：16:9（生視頻模型的通用橫屏檔），視頻/圖都鋪滿整個格 */
+  .slot.got.wide{grid-column:1 / -1;aspect-ratio:16/9;}
+  .slot.got.wide img,.slot.got.wide video{width:100%;height:100%;object-fit:cover;display:block;}
+  /* 橫卡的名字/序號：豎卡是烘在圖裡的信息條，橫卡沒有，用底部漸變字幕條補上 */
+  .slot.got.wide .wide-cap{
+    position:absolute;left:0;right:0;bottom:0;display:flex;align-items:flex-end;
+    justify-content:space-between;gap:10px;padding:28px 12px 9px;pointer-events:none;
+    background:linear-gradient(to top,rgba(18,12,8,.80) 0%,rgba(18,12,8,.44) 52%,transparent 100%);
+  }
+  .slot.got.wide .wide-cap b{
+    font-size:14px;font-weight:900;color:#fff;letter-spacing:.02em;
+    text-shadow:0 2px 6px rgba(0,0,0,.65);
+  }
+  .slot.got.wide .wide-cap i{
+    font-style:normal;font-size:11px;font-weight:900;color:rgba(255,255,255,.84);
+    letter-spacing:.08em;text-shadow:0 2px 6px rgba(0,0,0,.65);white-space:nowrap;
+  }
   .slot .num{
     position:absolute;top:7px;right:7px;min-width:24px;height:24px;padding:0 6px;border-radius:12px;
     background:var(--red);border:2.5px solid var(--ink);color:#fff;font-size:12px;font-weight:900;
@@ -219,6 +234,7 @@
   @keyframes fadeOut{to{opacity:0;}}
 
   .reveal-inner{position:relative;width:min(80vw,330px);}
+  .reveal-inner.wide{width:min(94vw,460px);}   /* 橫卡：豎屏寬度有限，盡量撐滿 */
 
   .reveal-card{
     width:100%;display:block;border-radius:18px;border:3px solid var(--ink);
@@ -365,6 +381,7 @@
     width:104px;margin:2px auto 0;display:block;border:3px solid var(--ink);border-radius:12px;
     box-shadow:0 4px 0 var(--ink);background:#fff;
   }
+  .swcard.wide{width:160px;}
   .swstep{margin:12px 0 0;font-size:11.5px;font-weight:800;color:#8c7f78;line-height:1.8;letter-spacing:.01em;}
   .swstep b{color:var(--ink);}
 
@@ -580,9 +597,12 @@
 <!-- ========== 3. 發卡放大預覽 ========== -->
 <div class="toast" id="toast"></div>
 <div class="reveal" id="reveal" aria-hidden="true">
-  <div class="reveal-inner">
+  <div class="reveal-inner" id="revealInner">
     <div class="glow"></div>
     <img class="reveal-card" id="revealCard" src="" alt="">
+    <!-- 隱藏款用視頻卡面：muted + playsinline 是 iOS 自動播放的硬性條件 -->
+    <video class="reveal-card" id="revealVideo" muted playsinline loop preload="none"
+           style="display:none;background:#1a1410"></video>
     <button class="reveal-close" id="btnCloseReveal" type="button" aria-label="關閉">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round">
         <path d="M5 5l14 14M19 5L5 19"/>
@@ -691,12 +711,13 @@
     { id:'D', name:'丸俠 · 好串！',   rank:'稀有', img:'assets/card_d.webp?v=20261117d', thumb:'assets/thumb_d.webp?v=20261117d' },
     /* ★ 隱藏款：雙角色同框。卡面圖未出，ready:false ⇒ 卡冊照樣顯示第 5 格（鎖定態）、但不進入抽卡池。
        出圖後把 card_e.webp / thumb_e.webp 放進 assets，並把 ready 改成 true 即可啟用。 */
-    { id:'E', name:'雙雄同框', rank:'隱藏', ready:false,
+    { id:'E', name:'雙雄同框', rank:'隱藏', ready:false, wide:true, vid:'assets/card_e.mp4',
       img:'assets/card_e.webp', thumb:'assets/thumb_e.webp' }
   ];
 
   /* 隱藏款是否可抽（等卡面圖就緒才開） */
   function drawable(c){ return c.ready !== false; }
+  function pad2(v){ return (v < 10 ? '0' : '') + v; }
 
   /* 發卡規則：'every-login' 每次登入發一張；'daily' 每天最多一張 */
   var DRAW_RULE = 'every-login';
@@ -738,6 +759,14 @@
   var btnSubmit=$('btnSubmit'), msgEl=$('msg');
   var album=$('album'), whoAmI=$('whoAmI'), progressEl=$('progress');
   var reveal=$('reveal'), revealCard=$('revealCard'), revealName=$('revealName'), revealTag=$('revealTag'), revealHint=$('revealHint');
+  var revealInner=$('revealInner'), revealVideo=$('revealVideo');
+  // 視頻加載失敗（編碼不支持 / 404）⇒ 回退靜態圖，不讓畫面空掉
+  revealVideo.addEventListener('error', function(){
+    if (!revealVideo.getAttribute('src')) return;
+    revealVideo.style.display = 'none';
+    revealCard.style.display = '';
+    if (!revealCard.src) revealCard.src = revealVideo.getAttribute('data-fallback') || '';
+  });
   var btnCloseReveal=$('btnCloseReveal'), btnLogout=$('btnLogout');
   var prizeList=$('prizeList'), wmTotal=$('wmTotal'), wmSub=$('wmSub');
   var sheetConfirm=$('sheetConfirm'), sheetDone=$('sheetDone'), sheetRecords=$('sheetRecords');
@@ -852,14 +881,15 @@
     (u.cards || []).forEach(function(id){ count[id] = (count[id] || 0) + 1; });
 
     var got = 0, html = '';
-    CARDS.forEach(function(c){
+    CARDS.forEach(function(c, idx){
       var n = count[c.id] || 0;
-      var wide = (c.id === 'E') ? ' wide' : '';
-      if (c.id === 'E'){
+      if (c.wide){
         if (n > 0 && drawable(c)){
           got++;
           html += '<div class="slot got wide" data-id="' + c.id + '">' +
                     '<img src="' + c.thumb + '" alt="' + c.name + '">' +
+                    '<div class="wide-cap"><b>' + c.name + '</b>' +
+                      '<i>' + pad2(idx + 1) + ' / ' + pad2(CARDS.length) + '</i></div>' +
                     (n > 1 ? '<div class="num">×' + n + '</div>' : '') +
                   '</div>';
         } else {
@@ -908,8 +938,26 @@
   /* ================= 發卡預覽 ================= */
   var revealTimer = null;
   function showReveal(card, fromAlbum){
-    revealCard.src = card.img;
-    revealCard.alt = card.name;
+    // 橫卡 ⇒ 放大層放寬；視頻卡 ⇒ 用 <video>，否則用 <img>
+    if (revealInner) revealInner.classList.toggle('wide', !!card.wide);
+    if (card.vid){
+      revealCard.style.display = 'none';
+      revealVideo.style.display = '';
+      revealVideo.setAttribute('data-fallback', card.img || '');
+      revealVideo.setAttribute('poster', card.img || '');   // 視頻加載前/失敗時顯示首幀
+      if (revealVideo.getAttribute('src') !== card.vid){
+        revealVideo.setAttribute('src', card.vid);
+        revealVideo.load();
+      }
+      var pr = revealVideo.play();
+      if (pr && pr.catch) pr.catch(function(){});   // iOS 低電量模式會被拒，忽略即可
+    } else {
+      revealVideo.pause();
+      revealVideo.style.display = 'none';
+      revealCard.style.display = '';
+      revealCard.src = card.img;
+      revealCard.alt = card.name;
+    }
     revealName.textContent = card.name;
     var RANK_TAG = { '普通':'普通卡片', '稀有':'稀有卡片', '隱藏':'隱藏款', '萬能':'萬能卡片' };
     if (fromAlbum){
@@ -931,6 +979,7 @@
 
   function hideReveal(){
     if (!reveal.classList.contains('on')) return;
+    revealVideo.pause();
     reveal.classList.add('out');
     reveal.setAttribute('aria-hidden', 'true');
     clearTimeout(revealTimer);
@@ -1407,6 +1456,7 @@
     var c = cardOf(pickedId), k = cnt[pickedId];
     soCard.src = c.thumb;
     soCard.alt = c.name;
+    soCard.classList.toggle('wide', !!c.wide);
     soSub.innerHTML = '「' + c.name + '」送出 <b>1 張</b>' +
       (k > 1 ? ('<br>送出後卡冊還剩 ' + (k - 1) + ' 張') : '<br>送出後卡冊不再持有此款');
 
@@ -1506,6 +1556,7 @@
     var c = cardOf(rec.cardId);
     cdCard.src = c ? c.thumb : '';
     cdCard.alt = c ? c.name : '';
+    cdCard.classList.toggle('wide', !!(c && c.wide));
     cdTitle.textContent = had ? '已收入卡冊' : '新卡入冊！';
     cdSub.innerHTML = '「' + (c ? c.name : rec.cardId) + '」<br>' +
       (had ? '你本來已有這款，現在多 1 張可以再換出去' : '這款你之前沒有，卡冊已點亮') +
