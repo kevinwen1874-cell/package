@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#FAF5EB">
-<meta name="description" content="丸俠出沒地點調查 — 你覺得橫掃飢餓的英雄丸俠可能出現在哪裡？大埔振興肉丸。">
+<meta name="description" content="丸俠出沒地點調查 — 會員登入後回答一題：你覺得橫掃飢餓的英雄丸俠可能出現在哪裡？大埔振興肉丸。">
 <title>丸俠會出現在哪裡？· 大埔振興肉丸</title>
 <style>
   :root{
@@ -33,6 +33,10 @@
   }
   .wrap{width:100%;max-width:430px;margin:0 auto;position:relative;z-index:2;}
 
+  /* ---------- 屏幕切換 ---------- */
+  .screen{display:none;}
+  .screen.on{display:block;}
+
   /* ---------- 品牌頭 ---------- */
   .brand{text-align:center;margin-bottom:16px;}
   .logos{display:flex;align-items:center;justify-content:center;gap:14px;}
@@ -49,8 +53,80 @@
   /* ---------- 卡片 ---------- */
   .panel{
     background:var(--white);border:3px solid var(--ink);border-radius:22px;
-    box-shadow:0 7px 0 var(--ink);padding:18px 16px 16px;
+    box-shadow:0 7px 0 var(--ink);padding:20px 18px 18px;
   }
+  .panel-title{
+    margin:0 0 16px;font-size:17px;font-weight:900;letter-spacing:.22em;text-indent:.22em;
+    text-align:center;color:var(--ink);
+  }
+  .panel-title::after{
+    content:"";display:block;width:44px;height:4px;border-radius:2px;background:var(--red);
+    margin:9px auto 0;
+  }
+
+  /* ---------- 表單 ---------- */
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:11.5px;font-weight:900;letter-spacing:.14em;color:#7d706a;margin:0 0 6px 3px;}
+  .field input{
+    width:100%;padding:13px 14px;border:3px solid var(--ink);border-radius:14px;background:#fff;
+    font:inherit;font-size:16px;font-weight:800;color:var(--ink);outline:none;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .field input::placeholder{color:#c0b4ae;font-weight:700;}
+  .field input:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(227,36,18,.11);}
+
+  .code-row{display:flex;gap:9px;align-items:stretch;}
+  .code-row input{flex:1 1 auto;min-width:0;letter-spacing:.18em;}
+  .code-btn{
+    flex:0 0 auto;padding:0 15px;border:3px solid var(--ink);border-radius:14px;background:var(--white);
+    font:inherit;font-size:13px;font-weight:900;letter-spacing:.06em;color:var(--red);cursor:pointer;
+    white-space:nowrap;transition:transform .1s,background .15s,color .15s;
+  }
+  .code-btn:active{transform:translateY(2px);}
+  .code-btn[disabled]{background:#EFE7DC;color:#a79b94;border-color:rgba(34,23,19,.35);cursor:default;}
+  .code-hint{
+    margin:7px 1px 0;font-size:11px;font-weight:800;line-height:1.5;letter-spacing:.02em;
+    color:var(--gold);display:none;
+  }
+  .code-hint.on{display:block;}
+
+  .autonote{
+    margin:4px 2px 13px;font-size:11px;font-weight:800;line-height:1.65;letter-spacing:.02em;
+    color:#9a8d86;text-align:center;
+  }
+
+  .btn{
+    width:100%;padding:15px;border:3px solid var(--ink);border-radius:16px;
+    background:var(--red);color:#fff;font:inherit;font-size:17px;font-weight:900;letter-spacing:.14em;
+    box-shadow:0 6px 0 var(--ink);cursor:pointer;
+    transition:transform .1s,box-shadow .1s,background .15s;
+  }
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink);}
+  .btn[disabled]{background:#c9bdb7;box-shadow:0 4px 0 var(--ink);cursor:default;transform:none;}
+
+  .msg{
+    margin:12px 2px 0;font-size:13px;font-weight:800;line-height:1.5;border-radius:10px;
+    padding:9px 11px;display:none;
+  }
+  .msg.on{display:block;}
+  .msg.err{background:#FDE8E5;color:#B81709;border:2px solid #F3BDB6;}
+  .msg.ok{background:#E8F6EC;color:#1D7B3E;border:2px solid #B8E0C4;}
+
+  .fineprint{margin:16px 0 0;text-align:center;font-size:11px;line-height:1.7;color:#9a8d86;font-weight:700;letter-spacing:.03em;}
+
+  /* ---------- 頂欄 ---------- */
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:13px;}
+  .topbar .t{font-size:16px;font-weight:900;letter-spacing:.1em;line-height:1.3;}
+  .who{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;margin-top:4px;white-space:nowrap;}
+  @media (max-width:389px){ .who .ws{display:none;} }
+  .ghost{
+    flex:0 0 auto;padding:9px 14px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;
+    font:inherit;font-size:12.5px;font-weight:900;letter-spacing:.1em;color:var(--ink);cursor:pointer;
+    box-shadow:0 3px 0 var(--ink);
+  }
+  .ghost:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink);}
+
+  /* ---------- 題目 ---------- */
   .q{
     margin:0 0 15px;font-size:clamp(15px,4.4vw,17px);font-weight:900;
     line-height:1.55;letter-spacing:.02em;
@@ -87,22 +163,11 @@
     content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold-lt);
   }
 
-  /* ---------- 按鈕 ---------- */
-  .btn{
-    display:block;width:100%;height:56px;margin-top:16px;
-    background:var(--red);color:#fff;border:3px solid var(--ink);border-radius:15px;
-    box-shadow:0 5px 0 var(--ink);
-    font:inherit;font-size:17px;font-weight:900;letter-spacing:.12em;text-indent:.12em;
-    cursor:pointer;transition:transform .1s ease,box-shadow .1s ease,background .14s ease;
-  }
-  .btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink);background:var(--red-dk);}
-  .btn:disabled{
-    background:#D8D0C2;color:#8C8175;border-color:#B9AE9E;
-    box-shadow:0 5px 0 #B9AE9E;cursor:not-allowed;transform:none;
-  }
-  .btn.ghost{
-    background:var(--white);color:var(--ink);box-shadow:0 4px 0 var(--ink);
-    font-size:14px;letter-spacing:.08em;height:48px;margin-top:14px;
+  .submit{margin-top:16px;font-size:17px;letter-spacing:.12em;text-indent:.12em;}
+
+  .note{
+    margin:14px 0 0;font-size:10.5px;line-height:1.7;color:#8C8175;
+    text-align:center;letter-spacing:.02em;
   }
 
   /* ---------- 結果 ---------- */
@@ -142,11 +207,6 @@
   .bar.mine .fill{background:var(--red);}
   .bar.mine .top .pc{color:var(--red);}
 
-  .note{
-    margin:14px 0 0;font-size:10.5px;line-height:1.7;color:#8C8175;
-    text-align:center;letter-spacing:.02em;
-  }
-
   .foot{
     margin:16px 0 0;text-align:center;font-size:10px;letter-spacing:.2em;
     color:#A2937F;text-indent:.2em;
@@ -157,12 +217,12 @@
     position:fixed;right:-26px;bottom:-30px;width:190px;opacity:.07;
     pointer-events:none;z-index:1;user-select:none;
   }
-  @media (max-height:660px){
+  @media (max-height:700px){
     .logos img{height:42px;}
     .brand{margin-bottom:12px;}
     .opt{height:50px;}
-    .btn{height:50px;margin-top:13px;}
     .panel{padding:15px 14px 14px;}
+    .q{margin-bottom:12px;}
   }
 </style>
 </head>
@@ -170,84 +230,290 @@
 <img class="watermark" src="../assets/mascot.webp" alt="" aria-hidden="true">
 <div class="wrap">
 
-  <header class="brand">
-    <div class="logos">
-      <img src="../assets/logo_wanxia.webp" alt="丸俠">
-      <img src="../assets/logo_taipo.webp" alt="大埔振興肉丸">
-    </div>
-    <h1>丸俠會出現在哪裡？</h1>
-    <div class="sub">ONE QUESTION · 10 SECONDS</div>
-  </header>
-
-  <!-- 問題卡 -->
-  <main id="formCard" class="panel">
-    <p class="q"><span class="mark">單選</span>你覺得橫掃飢餓的英雄丸俠，可能出現在？</p>
-
-    <div class="opts" id="opts">
-      <button type="button" class="opt" data-i="0">
-        <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 9.5V20h16V9.5"/><path d="M3 9.5 5 4h14l2 5.5z"/><path d="M9.5 20v-5h5v5"/></svg></span>
-        <span class="txt">便利店</span>
-        <span class="dot"></span>
-      </button>
-      <button type="button" class="opt" data-i="1">
-        <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 5h2.2l2.3 9.6h10.1L20 8H6.2"/><circle cx="9.4" cy="18.6" r="1.5"/><circle cx="17.2" cy="18.6" r="1.5"/></svg></span>
-        <span class="txt">超市</span>
-        <span class="dot"></span>
-      </button>
-      <button type="button" class="opt" data-i="2">
-        <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4v3"/><path d="M3 8c3.2 2.4 14.8 2.4 18 0"/><path d="M4.5 8.4 3 20h18l-1.5-11.6"/><path d="M9 20v-5h6v5"/></svg></span>
-        <span class="txt">小吃攤</span>
-        <span class="dot"></span>
-      </button>
-      <button type="button" class="opt" data-i="3">
-        <span class="ico"><svg viewBox="0 0 24 24"><path d="M3.2 11.5h17.6c0 4.4-3.6 7.5-8.8 7.5S3.2 15.9 3.2 11.5z"/><path d="M7.6 8.6c0-1.6 1.4-2 1.4-3.4"/><path d="M12 8.6c0-1.6 1.4-2 1.4-3.4"/><path d="M16.4 8.6c0-1.6 1.4-2 1.4-3.4"/></svg></span>
-        <span class="txt">餐廳</span>
-        <span class="dot"></span>
-      </button>
+  <!-- ========== 1. 會員登陸 ========== -->
+  <section id="scrAuth" class="screen">
+    <div class="brand">
+      <div class="logos">
+        <img src="../assets/logo_wanxia.webp" alt="丸俠">
+        <img src="../assets/logo_taipo.webp" alt="大埔振興肉丸">
+      </div>
+      <h1>丸俠會出現在哪裡？</h1>
+      <div class="sub">ONE QUESTION · 10 SECONDS</div>
     </div>
 
-    <button type="button" class="btn" id="submit" disabled>提交答案</button>
-    <p class="note">本頁為靜態展示頁，答案只會保存在你這台裝置的瀏覽器內。</p>
-  </main>
+    <div class="panel">
+      <h2 class="panel-title">會員登陸</h2>
 
-  <!-- 結果卡 -->
-  <section id="doneCard" class="panel done" aria-live="polite">
-    <div class="tick"><svg viewBox="0 0 24 24"><path d="m5 12.8 4.6 4.4L19 6.6"/></svg></div>
-    <h2>答案已記錄</h2>
-    <p class="picked">你選了 <b id="pickedTxt">—</b></p>
-    <div class="bars" id="bars"></div>
-    <button type="button" class="btn ghost" id="again">重新選擇</button>
-    <p class="note">以上為本機測試數據 · 僅保存在這台裝置</p>
+      <div class="field">
+        <label for="inPhone">手機號碼</label>
+        <input id="inPhone" type="tel" inputmode="numeric" autocomplete="tel"
+               placeholder="請輸入手機號碼" maxlength="15">
+      </div>
+
+      <div class="field">
+        <label for="inCode">驗證碼</label>
+        <div class="code-row">
+          <input id="inCode" type="tel" inputmode="numeric" autocomplete="one-time-code"
+                 placeholder="6 位數字" maxlength="6">
+          <button class="code-btn" id="btnSendCode" type="button">獲取驗證碼</button>
+        </div>
+        <div class="code-hint" id="codeHint"></div>
+      </div>
+
+      <p class="autonote">如未有大埔振興會員，系統會自動將手機號用於註冊會員</p>
+
+      <button class="btn" id="btnLogin" type="button">登入並開始</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <p class="fineprint">登入後即可參與本次單題調查<br>每個手機號限投一次</p>
   </section>
 
-  <p class="foot">大埔振興肉丸 × 丸俠</p>
+  <!-- ========== 2. 問卷 ========== -->
+  <section id="scrSurvey" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="t">丸俠會出現在哪裡？</div>
+        <div class="who" id="whoAmI">—</div>
+      </div>
+      <button class="ghost" id="btnLogout" type="button">換號</button>
+    </div>
+
+    <main id="formCard" class="panel">
+      <p class="q"><span class="mark">單選</span>你覺得橫掃飢餓的英雄丸俠，可能出現在？</p>
+
+      <div class="opts" id="opts">
+        <button type="button" class="opt" data-i="0">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 9.5V20h16V9.5"/><path d="M3 9.5 5 4h14l2 5.5z"/><path d="M9.5 20v-5h5v5"/></svg></span>
+          <span class="txt">便利店</span>
+          <span class="dot"></span>
+        </button>
+        <button type="button" class="opt" data-i="1">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 5h2.2l2.3 9.6h10.1L20 8H6.2"/><circle cx="9.4" cy="18.6" r="1.5"/><circle cx="17.2" cy="18.6" r="1.5"/></svg></span>
+          <span class="txt">超市</span>
+          <span class="dot"></span>
+        </button>
+        <button type="button" class="opt" data-i="2">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4v3"/><path d="M3 8c3.2 2.4 14.8 2.4 18 0"/><path d="M4.5 8.4 3 20h18l-1.5-11.6"/><path d="M9 20v-5h6v5"/></svg></span>
+          <span class="txt">小吃攤</span>
+          <span class="dot"></span>
+        </button>
+        <button type="button" class="opt" data-i="3">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M3.2 11.5h17.6c0 4.4-3.6 7.5-8.8 7.5S3.2 15.9 3.2 11.5z"/><path d="M7.6 8.6c0-1.6 1.4-2 1.4-3.4"/><path d="M12 8.6c0-1.6 1.4-2 1.4-3.4"/><path d="M16.4 8.6c0-1.6 1.4-2 1.4-3.4"/></svg></span>
+          <span class="txt">餐廳</span>
+          <span class="dot"></span>
+        </button>
+      </div>
+
+      <button type="button" class="btn submit" id="submit" disabled>提交答案</button>
+      <p class="note">本頁為靜態展示頁，答卷保存在你這台裝置的瀏覽器內。</p>
+    </main>
+
+    <section id="doneCard" class="panel done" aria-live="polite">
+      <div class="tick"><svg viewBox="0 0 24 24"><path d="m5 12.8 4.6 4.4L19 6.6"/></svg></div>
+      <h2 id="doneTitle">答案已記錄</h2>
+      <p class="picked" id="donePicked">你選了 <b>—</b></p>
+      <div class="bars" id="bars"></div>
+      <p class="note">以上為本機測試數據 · 僅保存在這台裝置</p>
+    </section>
+
+    <p class="foot">大埔振興肉丸 × 丸俠</p>
+  </section>
+
 </div>
 
 <script>
 (function(){
-  var KEY   = 'WX_SURVEY_LOCATION_V1';
+  /* ===== 存儲鍵 ===== */
+  var K_USERS   = 'wanxia.users.v2';          // 與集卡活動頁共用同一套會員表
+  var K_SESSION = 'WX_SURVEY_SESSION';        // 本次登入狀態（手機號）
+  var K_VOTES   = 'WX_SURVEY_LOCATION_V2';    // { 手機號: 選項索引 }
+
   var LABEL = ['便利店','超市','小吃攤','餐廳'];
-  var state = load();
-  var sel   = -1;
+  var CODE_TTL = 5 * 60 * 1000;
+  var RESEND_GAP = 60;
 
-  function load(){
-    try{
-      var s = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if(s && s.counts && s.counts.length === 4) return s;
-    }catch(e){}
-    return { counts:[0,0,0,0], my:-1, voted:false, ts:0 };
+  /* ===== DOM ===== */
+  var $ = function(id){ return document.getElementById(id); };
+  var scrAuth = $('scrAuth'), scrSurvey = $('scrSurvey');
+  var inPhone = $('inPhone'), inCode = $('inCode');
+  var btnSendCode = $('btnSendCode'), btnLogin = $('btnLogin');
+  var codeHint = $('codeHint'), msg = $('msg');
+  var whoAmI = $('whoAmI'), btnLogout = $('btnLogout');
+  var formCard = $('formCard'), doneCard = $('doneCard');
+  var submitBtn = $('submit');
+  var pickedEl = $('donePicked'), doneTitle = $('doneTitle'), barsBox = $('bars');
+  var opts = Array.prototype.slice.call(document.querySelectorAll('.opt'));
+
+  var sent = { phone:'', code:'', exp:0 };
+  var coolTimer = null, coolLeft = 0;
+  var sel = -1, me = '';
+
+  /* ===== 工具 ===== */
+  function digits(s){ return (s || '').replace(/\D/g, ''); }
+  function validPhone(p){ return p.length === 8 || p.length === 11; }
+  function maskPhone(p){
+    if (p.length === 11) return p.slice(0, 3) + ' **** ' + p.slice(-4);
+    if (p.length === 8)  return p.slice(0, 4) + ' ****';
+    return p;
   }
-  function save(){
-    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  function say(text, kind){
+    msg.textContent = text;
+    msg.className = 'msg on ' + (kind || 'err');
+  }
+  function clearMsg(){
+    msg.textContent = '';
+    msg.className = 'msg';
   }
 
-  var opts      = Array.prototype.slice.call(document.querySelectorAll('.opt'));
-  var submitBtn = document.getElementById('submit');
-  var formCard  = document.getElementById('formCard');
-  var doneCard  = document.getElementById('doneCard');
-  var barsBox   = document.getElementById('bars');
-  var pickedTxt = document.getElementById('pickedTxt');
+  /* ===== 會員表（與集卡頁互通） ===== */
+  function readUsers(){
+    try { return JSON.parse(localStorage.getItem(K_USERS) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function writeUsers(u){
+    try { localStorage.setItem(K_USERS, JSON.stringify(u)); } catch(e){}
+  }
 
+  /* ===== 票數 ===== */
+  function readVotes(){
+    try { return JSON.parse(localStorage.getItem(K_VOTES) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function writeVotes(v){
+    try { localStorage.setItem(K_VOTES, JSON.stringify(v)); } catch(e){}
+  }
+  function myVote(){
+    var v = readVotes();
+    return Object.prototype.hasOwnProperty.call(v, me) ? v[me] : -1;
+  }
+
+  /* ===== 驗證碼 ===== */
+  function setSendBtn(){
+    if (coolLeft > 0){
+      btnSendCode.disabled = true;
+      btnSendCode.textContent = '重發 ' + coolLeft + 's';
+    } else {
+      btnSendCode.disabled = false;
+      btnSendCode.textContent = '獲取驗證碼';
+    }
+  }
+  function startCool(){
+    coolLeft = RESEND_GAP;
+    setSendBtn();
+    clearInterval(coolTimer);
+    coolTimer = setInterval(function(){
+      coolLeft--;
+      if (coolLeft <= 0){
+        clearInterval(coolTimer);
+        coolLeft = 0;
+      }
+      setSendBtn();
+    }, 1000);
+  }
+  function sendCode(){
+    clearMsg();
+    var p = digits(inPhone.value);
+    inPhone.value = p;
+
+    if (!p) return say('請先輸入手機號碼');
+    if (!validPhone(p)) return say('手機號碼應為 8 位或 11 位數字');
+
+    var code = String(Math.floor(100000 + Math.random() * 900000));
+    sent = { phone: p, code: code, exp: Date.now() + CODE_TTL };
+
+    codeHint.textContent = '測試通道驗證碼 ' + code + ' · 5 分鐘內有效';
+    codeHint.classList.add('on');
+
+    startCool();
+    inCode.value = '';
+    inCode.focus();
+  }
+  btnSendCode.addEventListener('click', sendCode);
+
+  /* ===== 登入 ===== */
+  var busy = false;
+  function doLogin(){
+    if (busy) return;
+    clearMsg();
+
+    var p = digits(inPhone.value);
+    inPhone.value = p;
+    var code = digits(inCode.value);
+
+    if (!p) return say('請先輸入手機號碼');
+    if (!validPhone(p)) return say('手機號碼應為 8 位或 11 位數字');
+    if (!code) return say('請輸入驗證碼');
+    if (code.length !== 6) return say('驗證碼應為 6 位數字');
+
+    if (!sent.code) return say('請先點擊「獲取驗證碼」');
+    if (sent.phone !== p) return say('驗證碼與手機號碼不符，請重新獲取');
+    if (Date.now() > sent.exp) return say('驗證碼已過期，請重新獲取');
+    if (sent.code !== code) return say('驗證碼錯誤');
+
+    var users = readUsers();
+    var isNew = !users[p];
+
+    busy = true;
+    btnLogin.disabled = true;
+
+    if (isNew){
+      users[p] = { phone: p, cards: [], at: Date.now() };
+      writeUsers(users);
+    }
+
+    me = p;
+    try { localStorage.setItem(K_SESSION, p); } catch(e){}
+
+    sent = { phone:'', code:'', exp:0 };
+    codeHint.classList.remove('on');
+    codeHint.textContent = '';
+    inCode.value = '';
+    clearInterval(coolTimer); coolLeft = 0; setSendBtn();
+
+    setTimeout(function(){
+      enterSurvey();
+      busy = false;
+      btnLogin.disabled = false;
+      clearMsg();
+    }, 240);
+  }
+  btnLogin.addEventListener('click', doLogin);
+  [inPhone, inCode].forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') doLogin();
+    });
+    el.addEventListener('input', function(){
+      var v = digits(el.value);
+      if (v !== el.value) el.value = v;
+    });
+  });
+
+  /* ===== 進問卷 ===== */
+  function enterSurvey(){
+    scrAuth.classList.remove('on');
+    scrSurvey.classList.add('on');
+
+    whoAmI.innerHTML = '<span class="wm">' + maskPhone(me) + '</span><span class="ws"> · 已登入</span>';
+
+    var v = myVote();
+    if (v >= 0){
+      showResult(v, true);      // 已投過：直接看結果，不給改
+    } else {
+      resetForm();
+    }
+    window.scrollTo({ top:0, behavior:'auto' });
+  }
+
+  function resetForm(){
+    formCard.style.display = '';
+    doneCard.classList.remove('on');
+    sel = -1;
+    opts.forEach(function(b){ b.classList.remove('sel'); });
+    submitBtn.disabled = true;
+  }
+
+  /* ===== 選項 ===== */
   opts.forEach(function(btn){
     btn.addEventListener('click', function(){
       sel = +btn.dataset.i;
@@ -256,41 +522,42 @@
     });
   });
 
+  /* ===== 提交 ===== */
   submitBtn.addEventListener('click', function(){
-    if(sel < 0) return;
-    if(!state.voted){
-      state.counts[sel] += 1;
-      state.voted = true;
-    }
-    state.my  = sel;
-    state.ts  = Date.now();
-    save();
-    render();
+    if (sel < 0) return;
+    if (myVote() >= 0) return;          // 雙保險：已投過不再寫
+
+    var votes = readVotes();
+    votes[me] = sel;
+    writeVotes(votes);
+
+    showResult(sel, false);
   });
 
-  document.getElementById('again').addEventListener('click', function(){
-    doneCard.classList.remove('on');
-    formCard.style.display = '';
-    sel = -1;
-    opts.forEach(function(b){ b.classList.remove('sel'); });
-    submitBtn.disabled = true;
-    window.scrollTo({ top:0, behavior:'smooth' });
-  });
-
-  function render(){
-    var total = state.counts.reduce(function(a,b){ return a + b; }, 0) || 1;
+  /* ===== 結果 ===== */
+  function showResult(mine, replay){
+    var votes = readVotes();
+    var counts = [0,0,0,0];
+    var total = 0;
+    Object.keys(votes).forEach(function(k){
+      var i = votes[k];
+      if (i >= 0 && i < 4){ counts[i]++; total++; }
+    });
+    if (!total) total = 1;
 
     formCard.style.display = 'none';
     doneCard.classList.add('on');
-    pickedTxt.textContent = LABEL[state.my] || '—';
+
+    doneTitle.textContent = replay ? '你已投過這一題' : '答案已記錄';
+    pickedEl.innerHTML = '你選了 <b>' + (LABEL[mine] || '—') + '</b>';
 
     barsBox.innerHTML = '';
     LABEL.forEach(function(name, i){
-      var n  = state.counts[i];
+      var n = counts[i];
       var pc = n / total * 100;
 
       var row = document.createElement('div');
-      row.className = 'bar' + (i === state.my ? ' mine' : '');
+      row.className = 'bar' + (i === mine ? ' mine' : '');
 
       var top = document.createElement('div');
       top.className = 'top';
@@ -311,11 +578,12 @@
       row.appendChild(top); row.appendChild(track);
       barsBox.appendChild(row);
     });
-    // 统一在挂载后再赋值，确保 0 → 目标值的过渡可见
+
+    /* 掛載後同步賦值：先 0% 再目標值，transition 才有動畫 */
     var fills = barsBox.querySelectorAll('.fill');
     void barsBox.offsetWidth;
-    for (var i = 0; i < fills.length; i++) {
-      var n = state.counts[i];
+    for (var i = 0; i < fills.length; i++){
+      var n = counts[i];
       var pc = n / total * 100;
       fills[i].style.width = Math.max(pc, n > 0 ? 4 : 0).toFixed(1) + '%';
     }
@@ -323,8 +591,35 @@
     window.scrollTo({ top:0, behavior:'smooth' });
   }
 
-  // 已投過票 → 直接顯示結果
-  if(state.voted && state.my >= 0) render();
+  /* ===== 換號（登出） ===== */
+  btnLogout.addEventListener('click', function(){
+    try { localStorage.removeItem(K_SESSION); } catch(e){}
+    me = '';
+    inPhone.value = '';
+    inCode.value = '';
+    sent = { phone:'', code:'', exp:0 };
+    codeHint.classList.remove('on');
+    codeHint.textContent = '';
+    clearInterval(coolTimer); coolLeft = 0; setSendBtn();
+    clearMsg();
+    resetForm();
+    scrSurvey.classList.remove('on');
+    scrAuth.classList.add('on');
+    inPhone.focus();
+    window.scrollTo({ top:0, behavior:'auto' });
+  });
+
+  /* ===== 啟動：有會話且會員存在就直接進 ===== */
+  (function boot(){
+    var saved = '';
+    try { saved = localStorage.getItem(K_SESSION) || ''; } catch(e){}
+    if (saved && readUsers()[saved]){
+      me = saved;
+      enterSurvey();
+    } else {
+      scrAuth.classList.add('on');
+    }
+  })();
 })();
 </script>
 </body>
