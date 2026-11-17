@@ -1018,13 +1018,19 @@
       revealCard.alt = card.name;
     }
     revealName.textContent = card.name;
+    /* ★ 萬能（A）與隱藏（E）卡：只認右上角的 × 關閉，點屏幕任意處都不關（用戶 2026-11-17 要求）。
+       理由是這兩張最稀有，手一抖點到背景就收掉，想再看要回卡冊翻 —— 用 data 屬性記錄本次是否鎖定。 */
+    var lockClose = (card.rank === '萬能' || card.rank === '隱藏');
+    reveal.setAttribute('data-lockclose', lockClose ? '1' : '0');
     var RANK_TAG = { '普通':'普通卡片', '稀有':'稀有卡片', '隱藏':'隱藏款', '萬能':'萬能卡片' };
     if (fromAlbum){
       revealTag.textContent = RANK_TAG[card.rank] || '普通卡片';
-      revealHint.textContent = '點擊空白處關閉 · 可與好友交換';
+      revealHint.textContent = lockClose ? '請按右上角 × 關閉 · 可與好友交換'
+                                         : '點擊空白處關閉 · 可與好友交換';
     } else {
       revealTag.textContent = card.rank === '普通' ? '獲得卡片' : (RANK_TAG[card.rank] || '獲得卡片');
-      revealHint.textContent = '已收入卡冊 · 可與好友交換';
+      revealHint.textContent = lockClose ? '已收入卡冊 · 請按右上角 × 關閉'
+                                         : '已收入卡冊 · 可與好友交換';
     }
 
     reveal.classList.remove('out');
@@ -1061,8 +1067,14 @@
   });
 
   // 點放大層的空白處也能關掉（點卡面本身不關）
+  // ★ 萬能 / 隱藏卡例外：只認右上角的 ×，點空白處不關，僅回一句提示，避免「點了沒反應像卡住」
   reveal.addEventListener('click', function(e){
-    if (e.target === reveal) hideReveal();
+    if (e.target !== reveal) return;
+    if (reveal.getAttribute('data-lockclose') === '1'){
+      toast('請按右上角的 × 關閉');
+      return;
+    }
+    hideReveal();
   });
 
   /* ================= 進入主界面（並發放卡片） ================= */
