@@ -213,6 +213,29 @@
   /* 隱藏款橫卡：16:9（生視頻模型的通用橫屏檔），視頻/圖都鋪滿整個格 */
   .slot.got.wide{grid-column:1 / -1;aspect-ratio:16/9;}
   .slot.got.wide img,.slot.got.wide video{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ★ 隱藏款黑金邊框（2026-11-17 用戶定案：不改視頻背景，靠邊框表達黑金身份）
+     語言沿用全站的粗黑描邊＋硬投影，外面再套兩層金圈與一圈暖光暈：
+       ① 深墨黑描邊（--ink 同色系）  ② 3px 暗金  ③ 2px 亮金  ④ 呼吸光暈
+     內圈另加一條 2px 金線與極淡內發光，讓畫面裡也「鑲」了一圈金。
+     只動邊框與陰影，視頻本身的顏色一律不碰。 */
+  .slot.got.wide{
+    border-color:#140E09;
+    box-shadow:0 5px 0 #140E09, 0 0 0 3px #C8912C, 0 0 0 5px #F6DC93;
+  }
+  /* 外光暈：獨立一層只動 opacity（合成層，不重繪卡格），避免低端機掉幀 */
+  .slot.got.wide::before{
+    content:'';position:absolute;inset:-6px;border-radius:20px;pointer-events:none;z-index:2;
+    box-shadow:0 0 16px 4px rgba(246,214,124,.55);will-change:opacity;
+    animation:eBreath 3.4s ease-in-out infinite;
+  }
+  @keyframes eBreath{0%,100%{opacity:.50;}50%{opacity:1;}}
+  /* 內圈：一條 2px 金線 + 極淡內發光，讓畫面裡也「鑲」了一圈金 */
+  .slot.got.wide::after{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
+    box-shadow:inset 0 0 0 2px rgba(246,220,147,.52), inset 0 0 26px rgba(246,220,147,.13);
+  }
+  .slot.got.wide:active{transform:translateY(3px);box-shadow:0 2px 0 #140E09, 0 0 0 3px #C8912C, 0 0 0 5px #F6DC93;}
   /* 橫卡的名字/序號：豎卡是烘在圖裡的信息條，橫卡沒有，用底部漸變字幕條補上
      ★ 名字居中顯示（用戶 2026-11-17 指定），序號絕對定位到右下角，不佔用居中空間 */
   .slot.got.wide .wide-cap{
@@ -272,6 +295,14 @@
     55%{opacity:1;}
     100%{transform:scale(1) rotate(0);opacity:1;}
   }
+
+  /* 橫卡在放大層同樣鑲黑金邊（深色遮罩上光暈比卡冊裡更明顯），「隱藏款」標籤一併轉黑金 */
+  .reveal-inner.wide .reveal-card{
+    border-color:#140E09;
+    box-shadow:0 20px 46px rgba(0,0,0,.55), 0 0 0 3px #C8912C, 0 0 0 5px #F6DC93,
+               0 0 30px 8px rgba(246,214,124,.34), 0 0 0 1px rgba(255,255,255,.06) inset;
+  }
+  .reveal-inner.wide .reveal-tag{background:#1A1310;color:#F6DC93;border-color:#C8912C;}
 
   .glow{
     position:absolute;inset:-14%;border-radius:50%;pointer-events:none;z-index:-1;
@@ -730,13 +761,13 @@
   var CARDS = [
     { id:'A', name:'大埔振興 · 王牌！', rank:'萬能', img:'assets/card_a.webp?v=20261117c', thumb:'assets/thumb_a.webp?v=20261117c' },
     { id:'B', name:'丸俠 · yummy！',  rank:'普通', img:'assets/card_b.webp?v=20261116d', thumb:'assets/thumb_b.webp?v=20261116d' },
-    { id:'C', name:'魚丸隊長 · 飛行！', rank:'稀有', img:'assets/card_c.webp?v=20261117e', thumb:'assets/thumb_c.webp?v=20261117e' },
-    { id:'D', name:'丸俠 · 好串！',   rank:'稀有', img:'assets/card_d.webp?v=20261117e', thumb:'assets/thumb_d.webp?v=20261117e' },
+    { id:'C', name:'魚丸隊長 · 飛行！', rank:'稀有', img:'assets/card_c.webp?v=20261117f', thumb:'assets/thumb_c.webp?v=20261117f' },
+    { id:'D', name:'丸俠 · 好串！',   rank:'稀有', img:'assets/card_d.webp?v=20261117f', thumb:'assets/thumb_d.webp?v=20261117f' },
     /* ★ 隱藏款：雙角色同框（橫卡 + 視頻）。2026-11-17 正式片上線，ready:true 進抽卡池。
        素材規格：card_e.mp4 864×486（精確 16:9）5.04s 24fps 無音軌 269KB；
        card_e.webp = 視頻首幀（poster，點開不跳）；thumb_e.webp = 拍掌瞬幀（卡冊格，衝擊力最強）。 */
-    { id:'E', name:'雙俠同框！', rank:'隱藏', ready:true, wide:true, vid:'assets/card_e.mp4?v=20261117e',
-      img:'assets/card_e.webp?v=20261117e', thumb:'assets/thumb_e.webp?v=20261117e' }
+    { id:'E', name:'雙俠同框！', rank:'隱藏', ready:true, wide:true, vid:'assets/card_e.mp4?v=20261117f',
+      img:'assets/card_e.webp?v=20261117f', thumb:'assets/thumb_e.webp?v=20261117f' }
   ];
 
   /* 隱藏款是否可抽（等卡面圖就緒才開） */
