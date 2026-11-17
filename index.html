@@ -715,10 +715,11 @@
     { id:'B', name:'丸俠 · yummy！',  rank:'普通', img:'assets/card_b.webp?v=20261116d', thumb:'assets/thumb_b.webp?v=20261116d' },
     { id:'C', name:'魚丸隊長 · 飛行！', rank:'稀有', img:'assets/card_c.webp?v=20261117d', thumb:'assets/thumb_c.webp?v=20261117d' },
     { id:'D', name:'丸俠 · 好串！',   rank:'稀有', img:'assets/card_d.webp?v=20261117d', thumb:'assets/thumb_d.webp?v=20261117d' },
-    /* ★ 隱藏款：雙角色同框。卡面圖未出，ready:false ⇒ 卡冊照樣顯示第 5 格（鎖定態）、但不進入抽卡池。
-       出圖後把 card_e.webp / thumb_e.webp / card_e.mp4 放進 assets，並把 ready 改成 true 即可啟用。 */
-    { id:'E', name:'雙雄同框', rank:'隱藏', ready:false, wide:true, vid:'assets/card_e.mp4',
-      img:'assets/card_e.webp', thumb:'assets/thumb_e.webp' }
+    /* ★ 隱藏款：雙角色同框（橫卡 + 視頻）。2026-11-17 正式片上線，ready:true 進抽卡池。
+       素材規格：card_e.mp4 864×486（精確 16:9）5.04s 24fps 無音軌 269KB；
+       card_e.webp = 視頻首幀（poster，點開不跳）；thumb_e.webp = 拍掌瞬幀（卡冊格，衝擊力最強）。 */
+    { id:'E', name:'雙雄同框', rank:'隱藏', ready:true, wide:true, vid:'assets/card_e.mp4?v=20261117',
+      img:'assets/card_e.webp?v=20261117', thumb:'assets/thumb_e.webp?v=20261117' }
   ];
 
   /* 隱藏款是否可抽（等卡面圖就緒才開） */
