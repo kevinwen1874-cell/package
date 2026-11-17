@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FAF5EB">
+<meta name="description" content="丸俠出沒地點調查 — 你覺得橫掃飢餓的英雄丸俠可能出現在哪裡？大埔振興肉丸。">
+<title>丸俠會出現在哪裡？· 大埔振興肉丸</title>
+<style>
+  :root{
+    --red:#E32412;
+    --red-dk:#B81709;
+    --gold:#A87E40;
+    --gold-lt:#D9B169;
+    --ink:#221713;
+    --paper:#FAF5EB;
+    --white:#FBFFFF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;min-height:100%;}
+  body{
+    background:var(--paper);
+    background-image:radial-gradient(rgba(34,23,19,.055) 1px,transparent 1px);
+    background-size:14px 14px;
+    color:var(--ink);
+    font-family:"PingFang HK","PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+    -webkit-text-size-adjust:100%;
+    padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 22px);
+    position:relative;
+    overflow-x:hidden;
+    display:flex;flex-direction:column;justify-content:center;
+    min-height:100vh;min-height:100dvh;
+  }
+  .wrap{width:100%;max-width:430px;margin:0 auto;position:relative;z-index:2;}
+
+  /* ---------- 品牌頭 ---------- */
+  .brand{text-align:center;margin-bottom:16px;}
+  .logos{display:flex;align-items:center;justify-content:center;gap:14px;}
+  .logos img{display:block;height:52px;width:auto;filter:drop-shadow(0 4px 6px rgba(34,23,19,.14));}
+  .brand h1{
+    margin:12px 0 0;font-size:clamp(21px,6vw,25px);font-weight:900;
+    letter-spacing:.06em;line-height:1.25;
+  }
+  .brand .sub{
+    margin-top:7px;font-size:10.5px;font-weight:800;letter-spacing:.24em;
+    color:var(--gold);text-indent:.24em;
+  }
+
+  /* ---------- 卡片 ---------- */
+  .panel{
+    background:var(--white);border:3px solid var(--ink);border-radius:22px;
+    box-shadow:0 7px 0 var(--ink);padding:18px 16px 16px;
+  }
+  .q{
+    margin:0 0 15px;font-size:clamp(15px,4.4vw,17px);font-weight:900;
+    line-height:1.55;letter-spacing:.02em;
+  }
+  .q .mark{
+    display:inline-block;background:var(--gold);color:var(--white);
+    font-size:10.5px;font-weight:800;letter-spacing:.14em;padding:3px 8px;
+    border-radius:6px;vertical-align:2px;margin-right:7px;
+  }
+
+  /* ---------- 選項 ---------- */
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    display:flex;align-items:center;gap:12px;width:100%;height:56px;
+    padding:0 14px;background:var(--white);color:var(--ink);
+    border:3px solid var(--ink);border-radius:15px;
+    box-shadow:0 4px 0 var(--ink);
+    font:inherit;font-size:16px;font-weight:800;letter-spacing:.04em;
+    cursor:pointer;text-align:left;
+    transition:transform .1s ease,box-shadow .1s ease,background .14s ease,color .14s ease;
+  }
+  .opt .ico{flex:0 0 auto;width:26px;height:26px;}
+  .opt .ico svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:1.9;
+    fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .opt .txt{flex:1 1 auto;}
+  .opt .dot{
+    flex:0 0 auto;width:21px;height:21px;border-radius:50%;
+    border:2.5px solid var(--ink);position:relative;transition:border-color .14s ease;
+  }
+  .opt:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink);}
+  .opt.sel{background:var(--ink);color:var(--paper);box-shadow:0 4px 0 var(--gold);}
+  .opt.sel .dot{border-color:var(--gold);}
+  .opt.sel .dot::after{
+    content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold-lt);
+  }
+
+  /* ---------- 按鈕 ---------- */
+  .btn{
+    display:block;width:100%;height:56px;margin-top:16px;
+    background:var(--red);color:#fff;border:3px solid var(--ink);border-radius:15px;
+    box-shadow:0 5px 0 var(--ink);
+    font:inherit;font-size:17px;font-weight:900;letter-spacing:.12em;text-indent:.12em;
+    cursor:pointer;transition:transform .1s ease,box-shadow .1s ease,background .14s ease;
+  }
+  .btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink);background:var(--red-dk);}
+  .btn:disabled{
+    background:#D8D0C2;color:#8C8175;border-color:#B9AE9E;
+    box-shadow:0 5px 0 #B9AE9E;cursor:not-allowed;transform:none;
+  }
+  .btn.ghost{
+    background:var(--white);color:var(--ink);box-shadow:0 4px 0 var(--ink);
+    font-size:14px;letter-spacing:.08em;height:48px;margin-top:14px;
+  }
+
+  /* ---------- 結果 ---------- */
+  .done{display:none;}
+  .done.on{display:block;}
+  .tick{
+    width:56px;height:56px;margin:2px auto 12px;border-radius:50%;
+    background:var(--gold);border:3px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 0 var(--ink);
+  }
+  .tick svg{width:28px;height:28px;stroke:#fff;stroke-width:3.2;fill:none;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .done h2{
+    margin:0 0 6px;font-size:19px;font-weight:900;text-align:center;letter-spacing:.04em;
+  }
+  .done .picked{
+    margin:0 0 16px;text-align:center;font-size:13.5px;color:#6B5B4D;line-height:1.6;
+  }
+  .done .picked b{color:var(--red);font-weight:900;}
+
+  .bars{margin:0 0 4px;}
+  .bar{margin-bottom:11px;}
+  .bar .top{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:12.5px;font-weight:800;margin-bottom:5px;letter-spacing:.03em;
+  }
+  .bar .top .pc{font-variant-numeric:tabular-nums;color:var(--gold);font-weight:900;}
+  .bar .track{
+    height:13px;border:2.5px solid var(--ink);border-radius:8px;
+    background:var(--paper);overflow:hidden;
+  }
+  .bar .fill{
+    height:100%;width:0;background:var(--gold);
+    transition:width .75s cubic-bezier(.22,.8,.28,1);
+  }
+  .bar.mine .fill{background:var(--red);}
+  .bar.mine .top .pc{color:var(--red);}
+
+  .note{
+    margin:14px 0 0;font-size:10.5px;line-height:1.7;color:#8C8175;
+    text-align:center;letter-spacing:.02em;
+  }
+
+  .foot{
+    margin:16px 0 0;text-align:center;font-size:10px;letter-spacing:.2em;
+    color:#A2937F;text-indent:.2em;
+  }
+
+  /* 裝飾水印 */
+  .watermark{
+    position:fixed;right:-26px;bottom:-30px;width:190px;opacity:.07;
+    pointer-events:none;z-index:1;user-select:none;
+  }
+  @media (max-height:660px){
+    .logos img{height:42px;}
+    .brand{margin-bottom:12px;}
+    .opt{height:50px;}
+    .btn{height:50px;margin-top:13px;}
+    .panel{padding:15px 14px 14px;}
+  }
+</style>
+</head>
+<body>
+<img class="watermark" src="../assets/mascot.webp" alt="" aria-hidden="true">
+<div class="wrap">
+
+  <header class="brand">
+    <div class="logos">
+      <img src="../assets/logo_wanxia.webp" alt="丸俠">
+      <img src="../assets/logo_taipo.webp" alt="大埔振興肉丸">
+    </div>
+    <h1>丸俠會出現在哪裡？</h1>
+    <div class="sub">ONE QUESTION · 10 SECONDS</div>
+  </header>
+
+  <!-- 問題卡 -->
+  <main id="formCard" class="panel">
+    <p class="q"><span class="mark">單選</span>你覺得橫掃飢餓的英雄丸俠，可能出現在？</p>
+
+    <div class="opts" id="opts">
+      <button type="button" class="opt" data-i="0">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 9.5V20h16V9.5"/><path d="M3 9.5 5 4h14l2 5.5z"/><path d="M9.5 20v-5h5v5"/></svg></span>
+        <span class="txt">便利店</span>
+        <span class="dot"></span>
+      </button>
+      <button type="button" class="opt" data-i="1">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 5h2.2l2.3 9.6h10.1L20 8H6.2"/><circle cx="9.4" cy="18.6" r="1.5"/><circle cx="17.2" cy="18.6" r="1.5"/></svg></span>
+        <span class="txt">超市</span>
+        <span class="dot"></span>
+      </button>
+      <button type="button" class="opt" data-i="2">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 4v3"/><path d="M3 8c3.2 2.4 14.8 2.4 18 0"/><path d="M4.5 8.4 3 20h18l-1.5-11.6"/><path d="M9 20v-5h6v5"/></svg></span>
+        <span class="txt">小吃攤</span>
+        <span class="dot"></span>
+      </button>
+      <button type="button" class="opt" data-i="3">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M3.2 11.5h17.6c0 4.4-3.6 7.5-8.8 7.5S3.2 15.9 3.2 11.5z"/><path d="M7.6 8.6c0-1.6 1.4-2 1.4-3.4"/><path d="M12 8.6c0-1.6 1.4-2 1.4-3.4"/><path d="M16.4 8.6c0-1.6 1.4-2 1.4-3.4"/></svg></span>
+        <span class="txt">餐廳</span>
+        <span class="dot"></span>
+      </button>
+    </div>
+
+    <button type="button" class="btn" id="submit" disabled>提交答案</button>
+    <p class="note">本頁為靜態展示頁，答案只會保存在你這台裝置的瀏覽器內。</p>
+  </main>
+
+  <!-- 結果卡 -->
+  <section id="doneCard" class="panel done" aria-live="polite">
+    <div class="tick"><svg viewBox="0 0 24 24"><path d="m5 12.8 4.6 4.4L19 6.6"/></svg></div>
+    <h2>答案已記錄</h2>
+    <p class="picked">你選了 <b id="pickedTxt">—</b></p>
+    <div class="bars" id="bars"></div>
+    <button type="button" class="btn ghost" id="again">重新選擇</button>
+    <p class="note">以上為本機測試數據 · 僅保存在這台裝置</p>
+  </section>
+
+  <p class="foot">大埔振興肉丸 × 丸俠</p>
+</div>
+
+<script>
+(function(){
+  var KEY   = 'WX_SURVEY_LOCATION_V1';
+  var LABEL = ['便利店','超市','小吃攤','餐廳'];
+  var state = load();
+  var sel   = -1;
+
+  function load(){
+    try{
+      var s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if(s && s.counts && s.counts.length === 4) return s;
+    }catch(e){}
+    return { counts:[0,0,0,0], my:-1, voted:false, ts:0 };
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  var opts      = Array.prototype.slice.call(document.querySelectorAll('.opt'));
+  var submitBtn = document.getElementById('submit');
+  var formCard  = document.getElementById('formCard');
+  var doneCard  = document.getElementById('doneCard');
+  var barsBox   = document.getElementById('bars');
+  var pickedTxt = document.getElementById('pickedTxt');
+
+  opts.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      sel = +btn.dataset.i;
+      opts.forEach(function(b){ b.classList.toggle('sel', b === btn); });
+      submitBtn.disabled = false;
+    });
+  });
+
+  submitBtn.addEventListener('click', function(){
+    if(sel < 0) return;
+    if(!state.voted){
+      state.counts[sel] += 1;
+      state.voted = true;
+    }
+    state.my  = sel;
+    state.ts  = Date.now();
+    save();
+    render();
+  });
+
+  document.getElementById('again').addEventListener('click', function(){
+    doneCard.classList.remove('on');
+    formCard.style.display = '';
+    sel = -1;
+    opts.forEach(function(b){ b.classList.remove('sel'); });
+    submitBtn.disabled = true;
+    window.scrollTo({ top:0, behavior:'smooth' });
+  });
+
+  function render(){
+    var total = state.counts.reduce(function(a,b){ return a + b; }, 0) || 1;
+
+    formCard.style.display = 'none';
+    doneCard.classList.add('on');
+    pickedTxt.textContent = LABEL[state.my] || '—';
+
+    barsBox.innerHTML = '';
+    LABEL.forEach(function(name, i){
+      var n  = state.counts[i];
+      var pc = n / total * 100;
+
+      var row = document.createElement('div');
+      row.className = 'bar' + (i === state.my ? ' mine' : '');
+
+      var top = document.createElement('div');
+      top.className = 'top';
+      var l = document.createElement('span');
+      l.textContent = name + ' · ' + n + ' 票';
+      var r = document.createElement('span');
+      r.className = 'pc';
+      r.textContent = pc.toFixed(0) + '%';
+      top.appendChild(l); top.appendChild(r);
+
+      var track = document.createElement('div');
+      track.className = 'track';
+      var fill = document.createElement('div');
+      fill.className = 'fill';
+      fill.style.width = '0%';
+      track.appendChild(fill);
+
+      row.appendChild(top); row.appendChild(track);
+      barsBox.appendChild(row);
+    });
+    // 统一在挂载后再赋值，确保 0 → 目标值的过渡可见
+    var fills = barsBox.querySelectorAll('.fill');
+    void barsBox.offsetWidth;
+    for (var i = 0; i < fills.length; i++) {
+      var n = state.counts[i];
+      var pc = n / total * 100;
+      fills[i].style.width = Math.max(pc, n > 0 ? 4 : 0).toFixed(1) + '%';
+    }
+
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  // 已投過票 → 直接顯示結果
+  if(state.voted && state.my >= 0) render();
+})();
+</script>
+</body>
+</html>
