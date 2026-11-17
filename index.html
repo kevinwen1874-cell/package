@@ -549,8 +549,8 @@
       <div id="prizeList"></div>
 
       <p class="ruleline">
-        兌換後卡片即被扣除，兌換碼 30 天內有效<br>
-        到店出示兌換碼即可領取，每人每款限兌一次
+        現金券兌換後即扣除卡片，集齊類獎品不扣卡<br>
+        兌換碼 30 天內有效，到店出示即可領取，每人每款限兌一次
       </p>
     </div>
   </section>
@@ -1110,8 +1110,13 @@
      per  = 每人限兌次數（0 = 不限次數）
      獎品一律不限庫存（不設「限量 N 份」） */
   var PRIZES = [
-    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',    per:1, note:'全線門市通用，不設找續',                icon:'ticket' },
-    { id:'p4', name:'限定丸俠公仔',        cost:0, need:'all', per:1, note:'需集齊全部 5 款，含隱藏款', icon:'doll'   }
+    /* p2：4 張卡換現金券 */
+    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',     per:1, note:'全線門市通用，不設找續',    icon:'ticket' },
+    /* p3：集齊 A–D 四款（不含隱藏款）即可兌
+       ★ cost 必須為 0 —— 若扣卡，卡冊就不再是全套，令下方 p4「集齊 5 張」永遠無法達成 */
+    { id:'p3', name:'大埔振興周邊禮物',    cost:0, need:'full',  per:1, note:'到店自選一款',            icon:'gift'   },
+    /* p4：集齊全部 5 款 ＋ 必須先兌換過 p3（req 指定的獎品） */
+    { id:'p4', name:'限定丸俠公仔',        cost:0, need:'all',   req:'p3', per:1, note:'',                icon:'doll'   }
   ];
 
   var ICON = {
@@ -1176,6 +1181,8 @@
     if (p.need === 'all' && !hasAllSet(cnt)) return { ok:false, label:'未集齊' };
     if (p.need === 'full' && !hasFullSet(cnt)) return { ok:false, label:'未集齊' };
     if (p.need === 'hidden' && !(cnt.E > 0)) return { ok:false, label:'未有隱藏款' };
+    /* 前置獎品：必須先兌換過 p.req 指定的獎品（集卡門檻優先於此判斷，未集齊時先報未集齊） */
+    if (p.req && redeemCount(u, p.req) < 1) return { ok:false, label:'先兌周邊' };
     if (total < p.cost) return { ok:false, label:'卡片不足' };
     return { ok:true, label:'兌換' };
   }
@@ -1230,8 +1237,9 @@
 
       var noteTxt = p.note;
       if (p.need === 'all'){
-        // 只留一行條件，不顯示集卡進度
+        // 只留條件，不顯示集卡進度
         needTxt = '需集齊所有 ' + CARDS.length + ' 張卡片！';
+        if (p.req) needTxt += '<br>＋ 先兌換過周邊';
         noteTxt = '';
       }
 
