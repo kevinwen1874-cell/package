@@ -106,6 +106,19 @@
   .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink);}
   .btn[disabled]{background:#c9bdb7;box-shadow:0 4px 0 var(--ink);cursor:default;}
 
+  /* ===== 測試用抽卡按鈕（僅網址帶 test 參數時出現，正式連結看不到） ===== */
+  #testDraw{
+    position:fixed;right:12px;bottom:12px;z-index:95;display:none;
+    padding:9px 12px;border:3px solid var(--ink);border-radius:14px;
+    background:#2B2622;color:#FFE9A8;
+    font:inherit;font-size:13px;font-weight:900;letter-spacing:.06em;line-height:1.25;
+    box-shadow:0 5px 0 var(--ink);cursor:pointer;
+    -webkit-tap-highlight-color:transparent;user-select:none;
+  }
+  #testDraw.on{display:block;}
+  #testDraw:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink);}
+  #testDraw .sub{display:block;margin-top:3px;font-size:10px;font-weight:700;letter-spacing:0;color:#C9BDAF;}
+
   .msg{
     margin:12px 2px 0;font-size:13px;font-weight:800;line-height:1.5;border-radius:10px;
     padding:9px 11px;display:none;
@@ -704,6 +717,8 @@
     <button class="btn" id="btnSwapLogClose" type="button">關閉</button>
   </div>
 </div>
+
+<button id="testDraw" type="button">測試抽卡<span class="sub">點一下抽 1 張 · Shift 連抽 10</span></button>
 
 <script>
 (function(){
@@ -1692,6 +1707,53 @@
       im.src = src;
     });
   }, 800);
+
+  /* ================= 測試工具：無限抽卡 =================
+     ★ 只在網址帶 test 時啟用（?test=1 或 #test），正式連結看不到這顆按鈕。
+     走的是同一套 drawCard() 權重，只是跳過 canDraw() 的發卡限制。 */
+  (function testDrawTool(){
+    var q = location.search + location.hash;
+    if (q.indexOf('test') < 0) return;
+
+    var btn = document.getElementById('testDraw');
+    if (!btn) return;
+    btn.classList.add('on');
+
+    var n = 0, last = null;
+
+    function once(){
+      var users = readUsers();
+      var u = users[currentUser];
+      if (!u) return null;
+      if (!u.cards) u.cards = [];
+      var owned = {};
+      u.cards.forEach(function(id){ owned[id] = 1; });
+      var card = drawCard(owned);
+      u.cards.push(card.id);
+      u.lastDraw = Date.now();
+      writeUsers(users);
+      return card;
+    }
+
+    function run(times){
+      if (!currentUser || !readUsers()[currentUser]){ toast('請先登入再測試'); return; }
+      for (var i = 0; i < times; i++){
+        var c = once();
+        if (!c) break;
+        last = c;
+        n++;
+      }
+      renderMain();
+      if (last) showReveal(last);
+      btn.innerHTML = '測試抽卡<span class="sub">已抽 ' + n + ' 張 · Shift 連抽 10</span>';
+    }
+
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      run(e.shiftKey ? 10 : 1);
+    });
+    btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  })();
 
   (function boot(){
     var cur = getCur();
