@@ -988,6 +988,40 @@
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
+  /* ================= 保底系統（BEGIN）=================
+     ★★★ 這是 2026-11-24 新加的唯一一段「保底」邏輯。整段連同 <style> 內無關，
+     要移除時：① 刪掉本 BEGIN~END 整段；② doDraw 內把 3 行改回 `var card = drawCard(owned);`；
+     ③ 測試工具 once() 內同樣改回。三處都標了「保底系統」字樣，Ctrl+F 就能找齊。
+     規則：同一輪 15 抽，第 8 抽出「王牌（萬能）」，第 15 抽出「隱藏款」，第 16 抽起重新計數。
+     計數存 u.drawN（這個用戶累計抽了幾次，只在本地 localStorage，不影響雲端）。 */
+  var PITY = [
+    { at: 8,  rank: '萬能' },   // 第 8 抽 ⇒ 王牌
+    { at: 15, rank: '隱藏' }    // 第 15 抽 ⇒ 隱藏款
+  ];
+  var PITY_CYCLE = 15;          // 一輪幾抽；改這裡就能拉長／縮短循環
+
+  function pityRankAt(n){       // n = 本輪第幾抽（1 起算）；不是保底抽就回 null
+    for (var i = 0; i < PITY.length; i++){
+      if (PITY[i].at === n) return PITY[i].rank;
+    }
+    return null;
+  }
+
+  /* 回傳 { card: 卡片, pity: '萬能'|'隱藏'|null }；順手把 u.drawN 加一 */
+  function drawCardPity(u, owned){
+    var n = ((u.drawN || 0) % PITY_CYCLE) + 1;
+    u.drawN = (u.drawN || 0) + 1;
+
+    var rank = pityRankAt(n);
+    if (rank){
+      var box = CARDS.filter(function(c){ return c.rank === rank && drawable(c); });
+      // 該檔位沒有可抽的卡（例如卡面未就緒）⇒ 退回普通權重，保底不生效
+      if (box.length) return { card: box[Math.floor(Math.random() * box.length)], pity: rank };
+    }
+    return { card: drawCard(owned), pity: null };
+  }
+  /* ================= 保底系統（END）================= */
+
   function canDraw(u){
     if (DRAW_RULE === 'daily'){
       var last = u.lastDraw || 0;
@@ -1101,12 +1135,23 @@
     var owned = {};
     (u.cards || []).forEach(function(id){ owned[id] = 1; });
 
-    var card = drawCard(owned);
+    /* 保底系統（BEGIN）：移除時把這 2 行換回 `var card = drawCard(owned);` */
+    var pr   = drawCardPity(u, owned);
+    var card = pr.card;
+    /* 保底系統（END） */
     u.cards.push(card.id);
     u.lastDraw = Date.now();
     writeUsers(users);
     renderMain();
-    setTimeout(function(){ showReveal(card); }, 300);
+    setTimeout(function(){
+      showReveal(card);
+      /* 保底系統（BEGIN）：保底出的卡在標籤上加記號，讓玩家知道「這是保底給的」 */
+      if (pr.pity){
+        revealTag.textContent = pr.pity === '隱藏' ? '保底 · 隱藏款'
+                                                   : '保底 · 萬能卡片';
+      }
+      /* 保底系統（END） */
+    }, 300);
   }
 
   /* ================= 登入（手機號 + 驗證碼，不存在則自動註冊） ================= */
@@ -1780,7 +1825,10 @@
       if (!u.cards) u.cards = [];
       var owned = {};
       u.cards.forEach(function(id){ owned[id] = 1; });
-      var card = drawCard(owned);
+      /* 保底系統（BEGIN）：移除時改回 `var card = drawCard(owned);`
+         走同一條保底路徑，才能在 ?test=1 用 Shift 連抽 10 驗證第 8 / 15 抽 */
+      var card = drawCardPity(u, owned).card;
+      /* 保底系統（END） */
       u.cards.push(card.id);
       u.lastDraw = Date.now();
       writeUsers(users);
