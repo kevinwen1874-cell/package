@@ -26,7 +26,7 @@
   }
   #stage{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
-  .screen{display:none;min-height:100%;padding:calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 16px);}
+  .screen{display:none;min-height:100%;padding:calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 12px);}
   .screen.on{display:flex;flex-direction:column;}
   .wrap{width:100%;max-width:430px;margin:auto;}
 
@@ -130,7 +130,7 @@
   .fineprint{margin:18px 0 0;text-align:center;font-size:11px;line-height:1.7;color:#9a8d86;font-weight:700;letter-spacing:.03em;}
 
   /* ---------- 主界面 ---------- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:13px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:11px;}
   .topbar .t{font-size:17px;font-weight:900;letter-spacing:.15em;}
   .who{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;margin-top:3px;white-space:nowrap;}
   /* 窄屏（≤389px）讓「· 已登入」讓位，避免手機號掩碼被折成兩行 */
@@ -185,7 +185,7 @@
   .sec-title h2{margin:0;font-size:15px;font-weight:900;letter-spacing:.16em;}
   .sec-title span{font-size:12px;font-weight:900;color:var(--red);letter-spacing:.05em;}
 
-  .album{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .album{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .slot{position:relative;aspect-ratio:900/1040;border-radius:15px;overflow:hidden;background:#fff;}
   .slot.got{border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);cursor:pointer;
     transition:transform .1s,box-shadow .1s;}
@@ -260,16 +260,18 @@
   .cardname{margin:7px 2px 0;font-size:11.5px;font-weight:800;color:#7d706a;letter-spacing:.02em;text-align:center;}
 
   /* 主界面動作按鈕：兌換 / 交換 */
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px;}
+  .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;}
   .act{
-    padding:19px 6px;border:3px solid var(--ink);border-radius:18px;
-    font:inherit;font-size:16px;font-weight:900;letter-spacing:.02em;
+    padding:17px 4px;border:3px solid var(--ink);border-radius:18px;
+    font:inherit;font-size:15px;font-weight:900;letter-spacing:.02em;
     box-shadow:0 6px 0 var(--ink);cursor:pointer;
     transition:transform .1s,box-shadow .1s,background .15s;
   }
   .act:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink);}
   .act-redeem{background:var(--red);color:#fff;}
   .act-swap{background:var(--white);color:var(--ink);}
+  /* 抽卡主按鈕：掃碼進來的人要一眼看到能抽卡，用金色跟另外兩顆區分 */
+  .act-draw{background:#F3BB34;color:var(--ink);}
 
   /* ---------- 發卡預覽 ---------- */
   .reveal{
@@ -568,6 +570,7 @@
       <div class="album" id="album"></div>
 
       <div class="actions">
+        <button class="act act-draw" id="btnDraw" type="button">抽一張卡片</button>
         <button class="act act-redeem" id="btnRedeem" type="button">兌換獎品！</button>
         <button class="act act-swap" id="btnSwap" type="button">交換卡片！</button>
       </div>
@@ -1082,11 +1085,14 @@
     showScreen(scrMain);
     renderMain();
     if (!withDraw) return;
+    doDraw();
+  }
 
+  /* 抽一張卡：登入領卡與「抽一張卡片」按鈕共用同一段，規則走 canDraw() */
+  function doDraw(){
     var users = readUsers();
     var u = users[currentUser];
     if (!u) return;
-
     if (!canDraw(u)){
       toast('今天已經領過卡片了，明天再來');
       return;
@@ -1715,6 +1721,7 @@
   });
 
   /* ================= 主界面動作 ================= */
+  $('btnDraw').addEventListener('click', function(){ doDraw(); });
   $('btnRedeem').addEventListener('click', function(){
     renderRedeem();
     showScreen(scrRedeem);
