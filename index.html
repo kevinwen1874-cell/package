@@ -724,17 +724,16 @@
     </div>
     <p class="ssub" id="dnExp" style="margin-top:11px;text-align:center"></p>
 
-    <!-- ★ 官網兌換引導（2026-11-28）：兌換碼彈出後，引導到官網註冊／登入會員，自行輸入兌換碼完成兌換。
-         全程線上自助，不涉及門市或店員（本活動由掃碼進入 H5，兌換在官網／App 內完成） -->
+    <!-- ★ 官網兌換引導（2026-11-28）：兌換碼彈出後，引導拿碼到官網自行輸入完成兌換。
+         全程線上自助（掃碼進 H5 → 官網輸入兌換碼），不走門市核銷、不再要求二次登入 -->
     <div class="gift">
-      <div class="gift-h">領取贈品 3 步</div>
+      <div class="gift-h">領取贈品 2 步</div>
       <ol class="gift-steps">
         <li><b>1</b><span>點擊下方按鈕，前往大埔振興官網</span></li>
-        <li><b>2</b><span>註冊新會員，或登入現有帳號</span></li>
-        <li><b>3</b><span>在官網輸入上方兌換碼，即完成兌換</span></li>
+        <li><b>2</b><span>在官網輸入上方兌換碼，即完成兌換</span></li>
       </ol>
       <a class="gift-btn" id="lnkOfficial" href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer">
-        前往官網註冊 / 登入會員
+        前往官網兌換
         <span class="sub">www.tpch.com.hk</span>
       </a>
     </div>
@@ -749,7 +748,7 @@
     <div class="reclist" id="recList"></div>
     <p class="gift-warn" style="margin-top:11px;line-height:1.6">
       憑兌換碼到 <a href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer"
-        style="color:#C0392B;text-decoration:underline">大埔振興官網</a> 註冊／登入會員後輸入兌換
+        style="color:#C0392B;text-decoration:underline">大埔振興官網</a> 輸入即可兌換
     </p>
     <button class="btn" id="btnRecClose" type="button">關閉</button>
   </div>
@@ -1270,10 +1269,10 @@
      獎品一律不限庫存（不設「限量 N 份」） */
   var PRIZES = [
     /* p2：4 張卡換現金券 */
-    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',     per:1, note:'全線門市通用，不設找續',    icon:'ticket' },
+    { id:'p2', name:'大埔振興 $50 現金券', cost:4, need:'',     per:1, note:'兌換後快遞寄出，不設找續', icon:'ticket' },
     /* p3：集齊 A–D 四款（不含隱藏款）即可兌
        ★ cost 必須為 0 —— 若扣卡，卡冊就不再是全套，令下方 p4「集齊 5 張」永遠無法達成 */
-    { id:'p3', name:'大埔振興周邊禮物',    cost:0, need:'full',  per:1, note:'到店自選一款',            icon:'gift'   },
+    { id:'p3', name:'大埔振興周邊禮物',    cost:0, need:'full',  per:1, note:'兌換後快遞寄出',  icon:'gift'   },
     /* p4：集齊全部 5 款 ＋ 必須先兌換過 p3（req 指定的獎品） */
     { id:'p4', name:'限定丸俠公仔',        cost:0, need:'all',   req:'p3', per:1, note:'',                icon:'doll'   }
   ];
