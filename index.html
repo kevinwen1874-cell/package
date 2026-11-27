@@ -333,6 +333,47 @@
   .reveal-name{margin:11px 0 0;color:#FBFFFF;font-size:19px;font-weight:900;letter-spacing:.09em;}
   .reveal-hint{margin:8px 0 0;color:rgba(251,255,254,.52);font-size:11.5px;font-weight:700;letter-spacing:.1em;}
 
+  /* ---------- 領取卡片成功（全屏頁）----------
+     與抽卡的 .reveal 分開：領卡有自己的眉標、送卡人、入冊說明與「回我的卡冊」按鈕 */
+  .claim{
+    position:fixed;inset:0;z-index:84;display:none;
+    flex-direction:column;align-items:center;justify-content:center;
+    padding:calc(env(safe-area-inset-top) + 22px) 20px calc(env(safe-area-inset-bottom) + 20px);
+    background:radial-gradient(circle at 50% 40%, rgba(74,40,16,.92) 0%, rgba(18,12,10,.97) 64%);
+    -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+  }
+  .claim.on{display:flex;animation:claimIn .28s ease both;}
+  @keyframes claimIn{from{opacity:0;}to{opacity:1;}}
+
+  .claim-eyebrow{
+    color:#F6DC93;font-size:11.5px;font-weight:900;letter-spacing:.44em;text-indent:.44em;
+    margin-bottom:16px;animation:capIn .5s .1s both;
+  }
+  .claim-cardwrap{position:relative;width:min(80vw,330px);}
+  .claim-cardwrap.wide{width:min(94vw,460px);}
+  .claim-card{
+    width:100%;display:block;border-radius:18px;border:3px solid var(--ink);
+    box-shadow:0 20px 46px rgba(0,0,0,.55);
+    animation:cardIn .64s cubic-bezier(.18,1.42,.42,1) both;
+    will-change:transform,opacity;
+  }
+  /* 橫卡（隱藏款）同放大層：黑金邊＋外發光 */
+  .claim-cardwrap.wide .claim-card{
+    border-color:#140E09;
+    box-shadow:0 20px 46px rgba(0,0,0,.55), 0 0 0 3px #C8912C, 0 0 0 5px #F6DC93,
+               0 0 30px 8px rgba(246,214,124,.34);
+  }
+  .claim-cap{margin-top:18px;text-align:center;animation:capIn .5s .42s both;}
+  .claim-tag{
+    display:inline-block;padding:5px 13px;border-radius:20px;background:var(--red);color:#fff;
+    font-size:11px;font-weight:900;letter-spacing:.22em;text-indent:.22em;border:2.5px solid var(--ink);
+  }
+  .claim-cardwrap.wide ~ .claim-cap .claim-tag{background:#1A1310;color:#F6DC93;border-color:#C8912C;}
+  .claim-name{margin:11px 0 0;color:#FBFFFF;font-size:21px;font-weight:900;letter-spacing:.09em;}
+  .claim-sub{margin:9px 0 0;color:rgba(251,255,254,.6);font-size:11.5px;font-weight:700;letter-spacing:.05em;line-height:1.75;}
+  .claim-sub b{color:#F6DC93;font-weight:900;}
+  .claim-actions{width:100%;max-width:340px;margin-top:26px;}
+
   /* ---------- 兌換獎品頁 ---------- */
   #scrRedeem .wrap{margin:0 auto;}
   .subbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
@@ -783,12 +824,22 @@
   </div>
 </div>
 
-<div class="sheet" id="sheetClaimDone">
-  <div class="sheet-box">
-    <h3 id="cdTitle">領取成功</h3>
-    <img class="swcard" id="cdCard" src="" alt="">
-    <p class="ssub" id="cdSub" style="margin-top:12px;text-align:center"></p>
-    <button class="btn" id="btnClaimClose" type="button" style="margin-top:14px">回我的卡冊</button>
+<!-- ========== 領取卡片成功（全屏頁） ========== -->
+<div class="claim" id="claimPage" role="dialog" aria-hidden="true">
+  <div class="claim-eyebrow">領 取 成 功</div>
+  <div class="claim-cardwrap" id="claimWrap">
+    <img class="claim-card" id="claimCard" src="" alt="">
+    <!-- 隱藏款是橫向視頻卡，領卡頁同樣放視頻（後備走 poster / 靜圖） -->
+    <video class="claim-card" id="claimVideo" muted playsinline loop preload="none"
+           style="display:none;background:#1a1410"></video>
+  </div>
+  <div class="claim-cap">
+    <span class="claim-tag" id="claimTag">普通卡片</span>
+    <h2 class="claim-name" id="claimName">—</h2>
+    <p class="claim-sub" id="claimSub">已收入你的卡冊</p>
+  </div>
+  <div class="claim-actions">
+    <button class="btn" id="btnClaimDone" type="button">回我的卡冊</button>
   </div>
 </div>
 
@@ -888,10 +939,19 @@
   var paneOut=$('paneOut'), paneIn=$('paneIn'), tabOut=$('tabOut'), tabIn=$('tabIn');
   var inSwap=$('inSwap');
   var sheetSwapOut=$('sheetSwapOut'), sheetSwapCode=$('sheetSwapCode');
-  var sheetClaimDone=$('sheetClaimDone'), sheetSwapLog=$('sheetSwapLog');
+  var sheetSwapLog=$('sheetSwapLog');
   var soCard=$('soCard'), soSub=$('soSub'), soWarn=$('soWarn');
   var scSub=$('scSub'), scCode=$('scCode'), scExp=$('scExp'), scTip=$('scTip');
-  var cdTitle=$('cdTitle'), cdCard=$('cdCard'), cdSub=$('cdSub');
+  var claimPage=$('claimPage'), claimWrap=$('claimWrap');
+  var claimCard=$('claimCard'), claimVideo=$('claimVideo');
+  var claimTag=$('claimTag'), claimName=$('claimName'), claimSub=$('claimSub');
+  // 領卡頁的視頻加載失敗同樣回退到靜圖，不讓卡面空掉
+  claimVideo.addEventListener('error', function(){
+    if (!claimVideo.getAttribute('src')) return;
+    claimVideo.style.display = 'none';
+    claimCard.style.display = '';
+    if (!claimCard.src) claimCard.src = claimVideo.getAttribute('poster') || '';
+  });
   var swLogList=$('swLogList');
 
   var currentUser = '';
@@ -1702,6 +1762,48 @@
     done(ok);
   }
 
+  /* ---------- 領取卡片成功：全屏頁（非彈層） ---------- */
+  var RANK_TAG_CP = { '普通':'普通卡片', '稀有':'稀有卡片', '隱藏':'隱藏款', '萬能':'萬能卡片' };
+
+  function openClaim(card, had, fromMask){
+    if (!card){ toast('卡片資料異常'); return; }
+
+    // 橫卡（隱藏款）走視頻，其餘走靜圖
+    claimWrap.classList.toggle('wide', !!card.wide);
+    if (card.vid){
+      claimCard.style.display = 'none';
+      claimVideo.style.display = '';
+      claimVideo.setAttribute('poster', card.img || '');
+      if (claimVideo.getAttribute('src') !== card.vid){
+        claimVideo.setAttribute('src', card.vid);
+        claimVideo.load();
+      }
+      var pr = claimVideo.play();
+      if (pr && pr.catch) pr.catch(function(){});   // iOS 低電量模式會被拒，忽略
+    } else {
+      claimVideo.pause();
+      claimVideo.style.display = 'none';
+      claimCard.style.display = '';
+      claimCard.src = card.img;
+      claimCard.alt = card.name;
+    }
+
+    claimTag.textContent = RANK_TAG_CP[card.rank] || '普通卡片';
+    claimName.textContent = card.name;
+    claimSub.innerHTML = (had ? '這款你本來已有，現在多 1 張可以再換出去'
+                              : '這是你的新卡，卡冊已點亮') +
+                         (fromMask ? '<br>來自 <b>' + fromMask + '</b>' : '');
+
+    claimPage.classList.add('on');
+    claimPage.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeClaim(){
+    claimVideo.pause();
+    claimPage.classList.remove('on');
+    claimPage.setAttribute('aria-hidden', 'true');
+  }
+
   function doClaim(){
     var raw = normSwap(inSwap.value);
     if (raw.length !== 8) return toast('請輸入 8 位交換碼');
@@ -1731,14 +1833,7 @@
     renderMain();
 
     var c = cardOf(rec.cardId);
-    cdCard.src = c ? c.thumb : '';
-    cdCard.alt = c ? c.name : '';
-    cdCard.classList.toggle('wide', !!(c && c.wide));
-    cdTitle.textContent = had ? '已收入卡冊' : '新卡入冊！';
-    cdSub.innerHTML = '「' + (c ? c.name : rec.cardId) + '」<br>' +
-      (had ? '你本來已有這款，現在多 1 張可以再換出去' : '這款你之前沒有，卡冊已點亮') +
-      (rec.fromMask ? '<br><span style="font-size:10.5px;color:#9a8d86">來自 ' + rec.fromMask + '</span>' : '');
-    openSheet(sheetClaimDone);
+    openClaim(c, had, rec.fromMask);
   }
 
   function openSwapLog(){
@@ -1793,8 +1888,8 @@
   $('btnCopyCode').addEventListener('click', function(){ copyText(scCode.textContent); });
   $('btnCodeClose').addEventListener('click', function(){ closeSheet(sheetSwapCode); });
   $('btnClaim').addEventListener('click', doClaim);
-  $('btnClaimClose').addEventListener('click', function(){
-    closeSheet(sheetClaimDone);
+  $('btnClaimDone').addEventListener('click', function(){
+    closeClaim();
     showScreen(scrMain);
   });
   $('btnSwapLog').addEventListener('click', openSwapLog);
@@ -1808,7 +1903,7 @@
     if (e.key === 'Enter') doClaim();
   });
 
-  [sheetSwapOut, sheetSwapCode, sheetClaimDone, sheetSwapLog].forEach(function(sh){
+  [sheetSwapOut, sheetSwapCode, sheetSwapLog].forEach(function(sh){
     sh.addEventListener('click', function(e){ if (e.target === sh) closeSheet(sh); });
   });
 
